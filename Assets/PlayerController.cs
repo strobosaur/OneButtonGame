@@ -14,8 +14,8 @@ public class PlayerController : Movable
     public float p1Spd = 5.0f;
 
     private float jumpForce;
-    private float jumpBuildSpd = 2.5f;
-    private float maxJumpForce = 1750.0f;
+    private float jumpBuildSpd = 3.5f;
+    private float maxJumpForce = 1000.0f;
     public bool isJumping = false;
 
     void Awake()
@@ -56,14 +56,14 @@ public class PlayerController : Movable
         
         moveInput = move.ReadValue<Vector2>();
         
-        if (btn.WasReleasedThisFrame()) {
-            Debug.Log("Button released : " + jumpForce);
-            PlayerJump();
-        } else if (btn.IsPressed()) {
-            PrepareJump(jumpBuildSpd);
-            //rb.AddForce(new Vector2(0f, 15f));
-            //isJumping = true;
-        } 
+        if (!isJumping){
+            if (btn.WasReleasedThisFrame()) {
+                Debug.Log("Button released : " + jumpForce);
+                PlayerJump();
+            } else if (btn.IsPressed()) {
+                PrepareJump(jumpBuildSpd);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -74,7 +74,8 @@ public class PlayerController : Movable
 
     protected override void OnCollide(Collider2D collider)
     {
-        isJumping = false;
+        if (rb.velocity.y < 0)
+            isJumping = false;
     }
 
     private void PrepareJump(float input)
@@ -88,5 +89,6 @@ public class PlayerController : Movable
         rb.AddForce(new Vector2(0f,jumpForce));
         jumpForce = 0f;
         isJumping = true;
+        isColliding = false;
     }
 }
