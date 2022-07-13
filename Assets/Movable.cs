@@ -19,6 +19,8 @@ public abstract class Movable : Collidable
     public float spdBoost = 1.0f;
     public float pushRecoverySpeed = 0.005f;
 
+    protected bool isColliding;
+
     // START
     protected override void Start()
     {
@@ -57,6 +59,7 @@ public abstract class Movable : Collidable
                 transform.Translate(0, moveDelta.y * Time.deltaTime, 0);
             } else {
                 movePos.y = 0;
+                isColliding = true;
             }
 
             // COLLISION CHECK X
@@ -67,6 +70,7 @@ public abstract class Movable : Collidable
                 transform.Translate(moveDelta.x * Time.deltaTime, 0, 0);
             } else {
                 movePos.x = 0;
+                isColliding = true;
             }
         } else {
             transform.Translate(moveDelta * Time.deltaTime);
