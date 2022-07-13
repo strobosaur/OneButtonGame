@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Movable : Collidable
+public abstract class Movable : MonoBehaviour
 {
     protected BoxCollider2D boxCollider;
     protected RaycastHit2D hit;
@@ -22,9 +22,8 @@ public abstract class Movable : Collidable
     protected bool isColliding;
 
     // START
-    protected override void Start()
+    protected virtual void Start()
     {
-        base.Start();
         boxCollider = GetComponent<BoxCollider2D>();
     }
 

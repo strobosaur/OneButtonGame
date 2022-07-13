@@ -14,9 +14,10 @@ public class PlayerController : Movable
     public float p1Spd = 5.0f;
 
     private float jumpForce;
-    private float jumpBuildSpd = 3.5f;
+    private float jumpBuildSpd = 10f;
     private float maxJumpForce = 1000.0f;
     public bool isJumping = false;
+    protected float distToGround;
 
     void Awake()
     {
@@ -50,32 +51,24 @@ public class PlayerController : Movable
         moveSpd = p1Spd;
     }
 
-    protected override void Update()
-    {
-        base.Update();
-        
+    protected void Update()
+    {        
         moveInput = move.ReadValue<Vector2>();
         
-        if (!isJumping){
+        //if (IsGrounded()){
             if (btn.WasReleasedThisFrame()) {
                 Debug.Log("Button released : " + jumpForce);
                 PlayerJump();
             } else if (btn.IsPressed()) {
                 PrepareJump(jumpBuildSpd);
             }
-        }
+        //}
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         UpdateMotor(new Vector2(moveInput.x,0));
-    }
-
-    protected override void OnCollide(Collider2D collider)
-    {
-        if (rb.velocity.y < 0)
-            isJumping = false;
     }
 
     private void PrepareJump(float input)
@@ -91,4 +84,14 @@ public class PlayerController : Movable
         isJumping = true;
         isColliding = false;
     }
+
+    protected bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, -Vector3.up, 0.1f);
+    }
+
+    // protected GameObject FindNearestEnemy()
+    // {
+
+    // }
 }
