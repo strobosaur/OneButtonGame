@@ -55,9 +55,11 @@ public class PlayerController : Movable
         base.Update();
         moveInput = move.ReadValue<Vector2>();
         if (btn.IsPressed()) {
-            PrepareJump(jumpBuildSpd);
+            //PrepareJump(jumpBuildSpd);
+            rb.AddForce(new Vector2(0f, 15f));
+            isJumping = true;
         } else if (btn.WasReleasedThisFrame()) {
-            PlayerJump();
+            //PlayerJump();
         }
     }
 
