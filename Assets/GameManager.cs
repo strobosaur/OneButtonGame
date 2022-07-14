@@ -60,16 +60,17 @@ public class GameManager : MonoBehaviour
     public (GameObject, float) FindNearestEnemy()
     {
         Transform t = player.GetComponent<Transform>();
-        float distance = Mathf.Infinity;
+        float distance = 10000f;
         float tempDist;
         int index = 0;
         
         for(int i = 0; i < enemyList.Count; i++)
         {
-            tempDist = Vector3.Distance(t.position, enemyList[i].GetComponent<Transform>().position);
-            if (tempDist < distance)
+            tempDist = Vector3.Distance(t.localPosition, enemyList[i].transform.localPosition);
+            if (tempDist < distance) {
                 distance = tempDist;
                 index = i;
+            }
         }
 
         return (enemyList[index], distance);
