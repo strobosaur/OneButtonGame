@@ -20,14 +20,25 @@ public class PlayerController : Movable
     protected float minGrapplingRange;
     public GrappleSystem grappleSystem;
 
+    public bool isAttacking;
+    private float lastAttack;
+    private float attackDuration = 1f;
+    private Vector2 attackTarget;
+
+    private float lastFlash;
+    private float flashRate = 0.025f;
+    public GameObject flashPrefab;
+
     public float p1Spd = 5.0f;
 
     private float jumpForce;
-    private float jumpBuildSpd = 10f;
+    private float jumpBuildSpd = 5f;
     private float maxJumpForce = 1000.0f;
     public bool isJumping = false;
     public bool isGrappling = false;
     protected float distToGround;
+
+    public ParticleSystem ghostTrail;
 
     void Awake()
     {
@@ -35,6 +46,7 @@ public class PlayerController : Movable
         rb = GetComponent<Rigidbody2D>();
         maxGrapplingRange = 6f;
         minGrapplingRange = 3f;
+        ghostTrail.Stop();
         // lineRenderer = new LineRenderer();
         // lineRenderer.startColor = Color.cyan;
         // lineRenderer.endColor = Color.red;
@@ -72,7 +84,7 @@ public class PlayerController : Movable
     {        
         moveInput = move.ReadValue<Vector2>();
         
-        if (!isGrappling) {
+        if (!isGrappling && !isAttacking) {
             if (btn.WasReleasedThisFrame()) {
                 PlayerJump(new Vector2(0,1));
             } else if (btn.IsPressed()) {
@@ -86,6 +98,19 @@ public class PlayerController : Movable
         CheckNearestEnemy();
         if (enemyInRange)
             GrappleNearestEnemy();
+
+        if (isAttacking){
+            FlashTrail(new Vector2(transform.position.x, transform.position.y));
+            if ((Time.time - lastAttack > attackDuration) || (Vector2.Distance(transform.position, attackTarget) < 0.25f)) {
+                isAttacking = false;
+            }
+        }
+
+        // if (rb.velocity.magnitude > 10f) {
+        //     ghostTrail.Play();
+        // } else {
+        //     ghostTrail.Stop();
+        // }
     }
 
     // Update is called once per frame
@@ -148,14 +173,26 @@ public class PlayerController : Movable
             PrepareJump(jumpBuildSpd);
         } else if (enemyInRange && btn.WasReleasedThisFrame()) {
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
+            Attack();
             PlayerJump(dir);
             grappleSystem.ResetRope();
             isGrappling = false;
         }
     }
 
-    protected void CollideEnemy()
+    protected void Attack()
     {
-        
+        isAttacking = true;
+        lastAttack = Time.time;
+        attackTarget = grapplingEnemy.transform.localPosition;
+    }
+
+    protected void FlashTrail(Vector2 flashPos)
+    {
+        if (Time.time - lastFlash > flashRate){
+            //Vector3 spawnPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            Instantiate(flashPrefab, new Vector3(flashPos.x, flashPos.y, 0f), Quaternion.identity);
+            lastFlash = Time.time;
+        }
     }
 }
