@@ -16,7 +16,8 @@ public class PlayerController : Movable
     public GameObject grapplingEnemy;
     public float nearestEnemyDist;
     public bool enemyInRange = false;
-    protected float grapplingRange;
+    protected float maxGrapplingRange;
+    protected float minGrapplingRange;
     public GrappleSystem grappleSystem;
 
     public float p1Spd = 5.0f;
@@ -32,7 +33,8 @@ public class PlayerController : Movable
     {
         playerControls = new InputController();
         rb = GetComponent<Rigidbody2D>();
-        grapplingRange = 3.5f;
+        maxGrapplingRange = 6f;
+        minGrapplingRange = 3f;
         // lineRenderer = new LineRenderer();
         // lineRenderer.startColor = Color.cyan;
         // lineRenderer.endColor = Color.red;
@@ -120,7 +122,7 @@ public class PlayerController : Movable
 
     protected void CheckNearestEnemy()
     {
-        if (nearestEnemyDist < grapplingRange)
+        if ((nearestEnemyDist < maxGrapplingRange) && (nearestEnemyDist > minGrapplingRange))
             enemyInRange = true;
         else {
             enemyInRange = false;
