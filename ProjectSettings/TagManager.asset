@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -13,7 +14,7 @@ TagManager:
   - UI
   - Blocking
   - Actor
-  - 
+  - Player
   - 
   - 
   - 
@@ -46,6 +47,9 @@ TagManager:
     locked: 0
   - name: ground
     uniqueID: 2719890399
+    locked: 0
+  - name: fx2
+    uniqueID: 1934102451
     locked: 0
   - name: actor
     uniqueID: 1244222075

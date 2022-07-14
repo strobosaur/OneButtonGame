@@ -16,6 +16,8 @@ public class PlayerController : Movable
     public GameObject grapplingEnemy;
     public float nearestEnemyDist;
     public bool enemyInRange = false;
+    protected float grapplingRange;
+    public GrappleSystem grappleSystem;
 
     public float p1Spd = 5.0f;
 
@@ -30,6 +32,7 @@ public class PlayerController : Movable
     {
         playerControls = new InputController();
         rb = GetComponent<Rigidbody2D>();
+        grapplingRange = 3.5f;
         // lineRenderer = new LineRenderer();
         // lineRenderer.startColor = Color.cyan;
         // lineRenderer.endColor = Color.red;
@@ -112,12 +115,12 @@ public class PlayerController : Movable
         var nearest = GameManager.instance.FindNearestEnemy();
         nearestEnemy = nearest.Item1;
         nearestEnemyDist = nearest.Item2;
-        Debug.DrawLine(nearestEnemy.transform.position, transform.position, Color.red, 1f);
+        //Debug.DrawLine(nearestEnemy.transform.position, transform.position, Color.red, 1f);
     }
 
     protected void CheckNearestEnemy()
     {
-        if (nearestEnemyDist < 3f)
+        if (nearestEnemyDist < grapplingRange)
             enemyInRange = true;
         else {
             enemyInRange = false;
@@ -132,17 +135,25 @@ public class PlayerController : Movable
             if (!isGrappling)
                 grapplingEnemy = nearestEnemy;
 
+            grappleSystem.UpdateGrappleSystem(grapplingEnemy.transform.position);
+
             isGrappling = true;
             Debug.DrawLine(grapplingEnemy.transform.position, transform.position, Color.red, 1f);
             // lineRenderer.SetPosition(0,rb.transform.localPosition);            
             // lineRenderer.SetPosition(1,nearestEnemy.transform.localPosition);
             
-            rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x,0f,Globals.G_INERTIA),-0.1f);
+            //rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x,0f,Globals.G_INERTIA),-0.1f);
             PrepareJump(jumpBuildSpd);
         } else if (enemyInRange && btn.WasReleasedThisFrame()) {
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
             PlayerJump(dir);
+            grappleSystem.ResetRope();
             isGrappling = false;
         }
+    }
+
+    protected void CollideEnemy()
+    {
+        
     }
 }
