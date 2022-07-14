@@ -15,7 +15,7 @@ TagManager:
   - Blocking
   - Actor
   - Player
-  - 
+  - Weapon
   - 
   - 
   - 
@@ -54,9 +54,9 @@ TagManager:
   - name: actor
     uniqueID: 1244222075
     locked: 0
+  - name: weapon
+    uniqueID: 2640076875
+    locked: 0
   - name: fx
     uniqueID: 1642570713
-    locked: 0
-  - name: UI
-    uniqueID: 2640076875
     locked: 0
