@@ -11,12 +11,17 @@ public class PlayerController : Movable
     private InputAction look;
     private InputAction btn;
 
+    public GameObject nearestEnemy;
+    public float nearestEnemyDist;
+    public bool enemyInRange = false;
+
     public float p1Spd = 5.0f;
 
-    private float jumpForce;
+    private Vector2 jumpForce;
     private float jumpBuildSpd = 10f;
     private float maxJumpForce = 1000.0f;
     public bool isJumping = false;
+    public bool isGrappling = false;
     protected float distToGround;
 
     void Awake()
@@ -55,14 +60,18 @@ public class PlayerController : Movable
     {        
         moveInput = move.ReadValue<Vector2>();
         
-        //if (IsGrounded()){
+        if (!isGrappling) {
             if (btn.WasReleasedThisFrame()) {
-                Debug.Log("Button released : " + jumpForce);
                 PlayerJump();
             } else if (btn.IsPressed()) {
-                PrepareJump(jumpBuildSpd);
+                PrepareJump(new Vector2(0,jumpBuildSpd));
             }
-        //}
+        }
+        
+        SetNearestEnemy();
+        CheckNearestEnemy();
+        if (enemyInRange)
+            GrappleNearestEnemy();
     }
 
     // Update is called once per frame
@@ -71,16 +80,19 @@ public class PlayerController : Movable
         UpdateMotor(new Vector2(moveInput.x,0));
     }
 
-    private void PrepareJump(float input)
+    private void PrepareJump(Vector2 input)
     {
-        jumpForce = Globals.Approach(jumpForce, maxJumpForce, input);
-        Debug.Log(jumpForce);
+        //float forceX = Globals.Approach(jumpForce.x, maxJumpForce, input.x);
+        //float forceY = Globals.Approach(jumpForce.y, maxJumpForce, input.y);
+        if (Vector2.Distance(Vector2.zero, jumpForce) < maxJumpForce)
+            jumpForce += input;
+        //Debug.Log(jumpForce);
     }
 
     private void PlayerJump()
     {
-        rb.AddForce(new Vector2(0f,jumpForce));
-        jumpForce = 0f;
+        rb.AddForce(jumpForce);
+        jumpForce = Vector2.zero;
         isJumping = true;
         isColliding = false;
     }
@@ -90,8 +102,35 @@ public class PlayerController : Movable
         return Physics.Raycast(transform.position, -Vector3.up, 0.1f);
     }
 
-    // protected GameObject FindNearestEnemy()
-    // {
+    protected void SetNearestEnemy()
+    {
+        var nearest = GameManager.instance.FindNearestEnemy();
+        nearestEnemy = nearest.Item1;
+        nearestEnemyDist = nearest.Item2;
+    }
 
-    // }
+    protected void CheckNearestEnemy()
+    {
+        if (nearestEnemyDist < 3f)
+            enemyInRange = true;
+        else {
+            enemyInRange = false;
+            isGrappling = false;
+        }
+    }
+
+    protected void GrappleNearestEnemy()
+    {
+        if (enemyInRange && btn.IsPressed())
+        {
+            isGrappling = true;
+            Vector2 dir = (nearestEnemy.transform.position - transform.position).normalized;
+            Debug.Log(dir);
+            rb.velocity = new Vector2(rb.velocity.x,-0.1f);
+            PrepareJump(dir * jumpBuildSpd);
+        } else if (enemyInRange && btn.WasReleasedThisFrame()) {
+            PlayerJump();
+            isGrappling = false;
+        }
+    }
 }

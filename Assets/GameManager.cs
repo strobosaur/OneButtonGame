@@ -56,4 +56,38 @@ public class GameManager : MonoBehaviour
             center.y += 1f;
         }
     }
+
+    public (GameObject, float) FindNearestEnemy()
+    {
+        Transform t = player.GetComponent<Transform>();
+        float distance = Mathf.Infinity;
+        float tempDist;
+        int index = 0;
+        
+        for(int i = 0; i < enemyList.Count; i++)
+        {
+            tempDist = Vector3.Distance(t.position, enemyList[i].GetComponent<Transform>().position);
+            if (tempDist < distance)
+                distance = tempDist;
+                index = i;
+        }
+
+        return (enemyList[index], distance);
+    }
+
+    public float DistanceNearestEnemy()
+    {
+        Transform t = player.GetComponent<Transform>();
+        float distance = Mathf.Infinity;
+        float tempDist;
+        
+        foreach (var enemy in enemyList)
+        {
+            tempDist = Vector3.Distance(t.position, enemy.GetComponent<Transform>().position);
+            if (tempDist < distance)
+                distance = tempDist;
+        }
+
+        return distance;
+    }
 }
