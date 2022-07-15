@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public FloatingTextManager floatingTextManager;
     public List<GameObject> enemyList;
     public GameObject enemyPrefab;
+    public ParticleSystem bloodPS;
 
     public int money;
 
@@ -36,9 +37,9 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public void ShowText(string msg, int fontSize, Color color, Vector3 position, Vector3 motion, float duration)
+    public void ShowText(string msg, Vector3 position, Color color, float duration = 2.0f, float motion = 15.0f, int fontSize = 16)
     {
-        floatingTextManager.Show(msg, fontSize, color, position, motion, duration);
+        floatingTextManager.Show(msg, fontSize, color, position, new Vector3(0,motion,0), duration);
     }
 
     private void SpawnEnemies(int amount, float minDist, Vector2 center)
@@ -90,5 +91,14 @@ public class GameManager : MonoBehaviour
         }
 
         return distance;
+    }
+
+    public void SpawnBlood(Vector2 position, Vector2 angle = new Vector2())
+    {
+        var ob = Instantiate(bloodPS, position, Quaternion.identity);
+        if (angle.magnitude > 0) {
+            var bs = ob.GetComponent<BloodPS>();
+            bs.SetAngle(angle);
+        }
     }
 }
