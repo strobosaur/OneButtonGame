@@ -24,6 +24,7 @@ public class PlayerController : Movable
     private float lastAttack;
     private float attackDuration = 1f;
     private Vector2 attackTarget;
+    public GameObject attackingEnemy;
 
     private float lastFlash;
     private float flashRate = 0.025f;
@@ -39,6 +40,7 @@ public class PlayerController : Movable
     protected float distToGround;
 
     public ParticleSystem ghostTrail;
+    public ParticleSystem flashPS;
 
     void Awake()
     {
@@ -52,6 +54,7 @@ public class PlayerController : Movable
         // lineRenderer.endColor = Color.red;
         // lineRenderer.startWidth = 2f;
         // lineRenderer.endWidth = 2f;
+        flashPS.Stop();
     }
 
     private void OnEnable()
@@ -100,17 +103,8 @@ public class PlayerController : Movable
             GrappleNearestEnemy();
 
         if (isAttacking){
-            FlashTrail(new Vector2(transform.position.x, transform.position.y));
-            if ((Time.time - lastAttack > attackDuration) || (Vector2.Distance(transform.position, attackTarget) < 0.25f)) {
-                isAttacking = false;
-            }
+            Attacking();
         }
-
-        // if (rb.velocity.magnitude > 10f) {
-        //     ghostTrail.Play();
-        // } else {
-        //     ghostTrail.Stop();
-        // }
     }
 
     // Update is called once per frame
@@ -175,6 +169,7 @@ public class PlayerController : Movable
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
             Attack();
             PlayerJump(dir);
+            flashPS.Play();
             grappleSystem.ResetRope();
             isGrappling = false;
         }
@@ -184,15 +179,29 @@ public class PlayerController : Movable
     {
         isAttacking = true;
         lastAttack = Time.time;
-        attackTarget = grapplingEnemy.transform.localPosition;
+        attackingEnemy = grapplingEnemy;
     }
 
-    protected void FlashTrail(Vector2 flashPos)
+    protected void Attacking()
     {
-        if (Time.time - lastFlash > flashRate){
-            //Vector3 spawnPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-            Instantiate(flashPrefab, new Vector3(flashPos.x, flashPos.y, 0f), Quaternion.identity);
-            lastFlash = Time.time;
+        if ((Time.time - lastAttack > attackDuration) || (Vector2.Distance(transform.position, attackTarget) < 0.25f)) {
+            isAttacking = false;
+            flashPS.Stop();
+            attackingEnemy = null;
+            return;
         }
+
+        Vector2 dir = attackingEnemy.transform.position - transform.position;
+        dir.Normalize();
+        float cross = Vector3.Cross(dir, transform.right).z;
+        rb.angularVelocity = 360 * cross;
     }
+
+    // protected void FlashTrail(Vector2 flashPos)
+    // {
+    //     if (Time.time - lastFlash > flashRate){
+    //         Instantiate(flashPrefab, new Vector3(flashPos.x, flashPos.y, 0f), Quaternion.identity);
+    //         lastFlash = Time.time;
+    //     }
+    // }
 }
