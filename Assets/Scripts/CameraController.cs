@@ -30,7 +30,7 @@ public class CameraController : MonoBehaviour
     // START
     public void Start()
     {
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
         lookAt = GameObject.Find(Globals.G_PLAYERNAME).transform;
     }
 
@@ -40,10 +40,13 @@ public class CameraController : MonoBehaviour
         targetDist = Vector2.Distance(transform.position, lookAt.position);
         // CHECK DISTANCE TO TARGET OBJECT
         if (Vector3.Distance(transform.position, lookAt.position) > camBounds){
-            camTarget = lookAt.position * camDistance;
-            moveDelta = new Vector2(camTarget.x, camTarget.y);
-            movePos = Vector2.Lerp(movePos, moveDelta, camSpd + (targetDist / 1000f));
+            if (GameManager.instance.playerDist < GameManager.instance.playerMaxDist)
+            {
+                camTarget = lookAt.position * camDistance;
+                moveDelta = new Vector2(camTarget.x, camTarget.y);
+            }
 
+            movePos = Vector2.Lerp(movePos, moveDelta, camSpd + (targetDist / 1000f));
             transform.position = new Vector3(movePos.x, movePos.y, transform.position.z);
         }        
     }
