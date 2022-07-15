@@ -34,6 +34,8 @@ public class PlayerController : Movable
     private float jumpForce;
     private float jumpBuildSpd = 0.05f;
     private float maxJumpForce = 20.0f;
+    private float lastJump;
+    private float jumpCooldown = 0.5f;
     public bool isJumping = false;
     public bool isGrappling = false;
     protected float distToGround;
@@ -73,6 +75,7 @@ public class PlayerController : Movable
     {
         base.Start();
         moveSpd = p1Spd;
+        lastJump = Time.time;
     }
 
     protected void Update()
@@ -117,11 +120,17 @@ public class PlayerController : Movable
 
     private void PlayerJump(Vector2 dir)
     {
-        Debug.Log((dir * jumpForce).magnitude);
-        rb.AddRelativeForce(dir * jumpForce, ForceMode2D.Impulse);
-        jumpForce = 0f;
-        isJumping = true;
-        isColliding = false;
+        if (Time.time - lastJump > jumpCooldown)
+        {
+            Debug.Log((dir * jumpForce).magnitude);
+            rb.AddRelativeForce(dir * jumpForce, ForceMode2D.Impulse);
+            jumpForce = 0f;
+            lastJump = Time.time;
+            isJumping = true;
+            isColliding = false;
+        } else {
+            jumpForce = 0f;
+        }
     }
 
     protected void SetNearestEnemy()
