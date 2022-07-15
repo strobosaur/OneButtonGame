@@ -95,6 +95,7 @@ public class GameManager : MonoBehaviour
         float distance = 10000f;
         float tempDist;
         int index = 0;
+        GameObject output = null;
         
         for(int i = 0; i < enemyList.Count; i++)
         {
@@ -103,9 +104,11 @@ public class GameManager : MonoBehaviour
                 distance = tempDist;
                 index = i;
             }
+
+            output = enemyList[index];
         }
 
-        return (enemyList[index], distance);
+        return (output, distance);
     }
 
     public float DistanceNearestEnemy()
@@ -145,7 +148,6 @@ public class GameManager : MonoBehaviour
     public void HandleGameOver()
     {
         float alpha = Mathf.Min(1f, ((Time.time - gameOverTime) / gameOverFade));
-        Debug.Log(alpha);
         Color col = goScreen.color;
         col = new Color(col.r, col.g, col.b, alpha);
         goScreen.color = col;

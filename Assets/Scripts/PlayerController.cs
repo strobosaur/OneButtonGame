@@ -32,7 +32,7 @@ public class PlayerController : Movable
     public float p1Spd = 5.0f;
 
     private float jumpForce;
-    private float jumpBuildSpd = 0.2f;
+    private float jumpBuildSpd = 0.05f;
     private float maxJumpForce = 20.0f;
     public bool isJumping = false;
     public bool isGrappling = false;
@@ -112,11 +112,12 @@ public class PlayerController : Movable
 
     private void PrepareJump(float input)
     {
-        jumpForce = Globals.Approach(jumpForce, maxJumpForce, input);
+        jumpForce = Globals.Approach(jumpForce, maxJumpForce, input + (jumpForce * 0.1f));
     }
 
     private void PlayerJump(Vector2 dir)
     {
+        Debug.Log((dir * jumpForce).magnitude);
         rb.AddRelativeForce(dir * jumpForce, ForceMode2D.Impulse);
         jumpForce = 0f;
         isJumping = true;
@@ -125,10 +126,13 @@ public class PlayerController : Movable
 
     protected void SetNearestEnemy()
     {
-        var nearest = GameManager.instance.FindNearestEnemy();
-        nearestEnemy = nearest.Item1;
-        nearestEnemyDist = nearest.Item2;
-        nearestEnemyDir = (nearestEnemy.transform.position - transform.position).normalized;
+        if (GameManager.instance.enemyList.Count > 0)
+        {
+            var nearest = GameManager.instance.FindNearestEnemy();
+            nearestEnemy = nearest.Item1;
+            nearestEnemyDist = nearest.Item2;
+            nearestEnemyDir = (nearestEnemy.transform.position - transform.position).normalized;
+        }
     }
 
     protected void CheckNearestEnemy()
