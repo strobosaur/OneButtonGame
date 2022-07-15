@@ -13,6 +13,7 @@ public class PlayerController : Movable
 
     private LineRenderer lineRenderer;
     public GameObject nearestEnemy;
+    private Vector2 nearestEnemyDir;
     public GameObject grapplingEnemy;
     public float nearestEnemyDist;
     public bool enemyInRange = false;
@@ -23,23 +24,20 @@ public class PlayerController : Movable
     public bool isAttacking;
     private float lastAttack;
     private float attackDuration = 1f;
+    private float attackDamping = 5f;
     private Vector2 attackTarget;
     public GameObject attackingEnemy;
-
-    private float lastFlash;
-    private float flashRate = 0.025f;
-    public GameObject flashPrefab;
+    public AttackHitbox attackHitbox;
 
     public float p1Spd = 5.0f;
 
     private float jumpForce;
-    private float jumpBuildSpd = 5f;
-    private float maxJumpForce = 1000.0f;
+    private float jumpBuildSpd = 0.2f;
+    private float maxJumpForce = 20.0f;
     public bool isJumping = false;
     public bool isGrappling = false;
     protected float distToGround;
 
-    public ParticleSystem ghostTrail;
     public ParticleSystem flashPS;
 
     void Awake()
@@ -48,12 +46,6 @@ public class PlayerController : Movable
         rb = GetComponent<Rigidbody2D>();
         maxGrapplingRange = 6f;
         minGrapplingRange = 3f;
-        ghostTrail.Stop();
-        // lineRenderer = new LineRenderer();
-        // lineRenderer.startColor = Color.cyan;
-        // lineRenderer.endColor = Color.red;
-        // lineRenderer.startWidth = 2f;
-        // lineRenderer.endWidth = 2f;
         flashPS.Stop();
     }
 
@@ -85,11 +77,11 @@ public class PlayerController : Movable
 
     protected void Update()
     {        
-        moveInput = move.ReadValue<Vector2>();
+        //moveInput = move.ReadValue<Vector2>();
         
         if (!isGrappling && !isAttacking) {
             if (btn.WasReleasedThisFrame()) {
-                PlayerJump(new Vector2(0,1));
+                PlayerJump(nearestEnemyDir);
             } else if (btn.IsPressed()) {
                 PrepareJump(jumpBuildSpd);
             }
@@ -104,6 +96,11 @@ public class PlayerController : Movable
 
         if (isAttacking){
             Attacking();
+        }
+
+        if ((Time.time - lastAttack > attackDuration)) {
+            flashPS.Stop();
+            StopAttack();
         }
     }
 
@@ -120,15 +117,10 @@ public class PlayerController : Movable
 
     private void PlayerJump(Vector2 dir)
     {
-        rb.AddForce(dir * jumpForce);
+        rb.AddRelativeForce(dir * jumpForce, ForceMode2D.Impulse);
         jumpForce = 0f;
         isJumping = true;
         isColliding = false;
-    }
-
-    protected bool IsGrounded()
-    {
-        return Physics.Raycast(transform.position, -Vector3.up, 0.1f);
     }
 
     protected void SetNearestEnemy()
@@ -136,7 +128,7 @@ public class PlayerController : Movable
         var nearest = GameManager.instance.FindNearestEnemy();
         nearestEnemy = nearest.Item1;
         nearestEnemyDist = nearest.Item2;
-        //Debug.DrawLine(nearestEnemy.transform.position, transform.position, Color.red, 1f);
+        nearestEnemyDir = (nearestEnemy.transform.position - transform.position).normalized;
     }
 
     protected void CheckNearestEnemy()
@@ -169,9 +161,6 @@ public class PlayerController : Movable
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
             Attack();
             PlayerJump(dir);
-            flashPS.Play();
-            grappleSystem.ResetRope();
-            isGrappling = false;
         }
     }
 
@@ -180,28 +169,30 @@ public class PlayerController : Movable
         isAttacking = true;
         lastAttack = Time.time;
         attackingEnemy = grapplingEnemy;
+        flashPS.Play();
+        grappleSystem.ResetRope();
+        isGrappling = false;
     }
 
     protected void Attacking()
     {
-        if ((Time.time - lastAttack > attackDuration) || (Vector2.Distance(transform.position, attackTarget) < 0.25f)) {
-            isAttacking = false;
-            flashPS.Stop();
-            attackingEnemy = null;
-            return;
-        }
-
+        attackHitbox.Attack();
         Vector2 dir = attackingEnemy.transform.position - transform.position;
         dir.Normalize();
         float cross = Vector3.Cross(dir, transform.right).z;
         rb.angularVelocity = 360 * cross;
     }
 
-    // protected void FlashTrail(Vector2 flashPos)
-    // {
-    //     if (Time.time - lastFlash > flashRate){
-    //         Instantiate(flashPrefab, new Vector3(flashPos.x, flashPos.y, 0f), Quaternion.identity);
-    //         lastFlash = Time.time;
-    //     }
-    // }
+    public void AttackHit(Vector2 dir)
+    {
+        rb.AddRelativeForce(dir * attackDamping, ForceMode2D.Impulse);
+        StopAttack();
+    }
+
+    private void StopAttack()
+    {
+        attackHitbox.Passive();
+        isAttacking = false;
+        attackingEnemy = null;
+    }
 }

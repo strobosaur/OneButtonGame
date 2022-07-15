@@ -5147,6 +5147,92 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &500309174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 500309175}
+  - component: {fileID: 500309176}
+  - component: {fileID: 500309177}
+  m_Layer: 8
+  m_Name: AttackHitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &500309175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500309174}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1265170239}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &500309176
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500309174}
+  m_Enabled: 0
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 2, y: 2}
+  m_EdgeRadius: 0
+--- !u!114 &500309177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500309174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 827403c31309c7545a088fe3c6a2b966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  filter:
+    useTriggers: 0
+    useLayerMask: 0
+    useDepth: 0
+    useOutsideDepth: 0
+    useNormalAngle: 0
+    useOutsideNormalAngle: 0
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 0
+    minDepth: 0
+    maxDepth: 0
+    minNormalAngle: 0
+    maxNormalAngle: 0
+  player: {fileID: 1265170237}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5339,7 +5425,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!198 &987557441
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -10391,11 +10477,12 @@ MonoBehaviour:
   enemyInRange: 0
   grappleSystem: {fileID: 1265170243}
   isAttacking: 0
-  flashPrefab: {fileID: 8859126045540302992, guid: c03e0edad9668cd458653a8e7306d337, type: 3}
+  attackingEnemy: {fileID: 0}
+  attackHitbox: {fileID: 500309177}
   p1Spd: 5
   isJumping: 0
   isGrappling: 0
-  ghostTrail: {fileID: 987557441}
+  flashPS: {fileID: 2114918174}
 --- !u!212 &1265170238
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -10464,6 +10551,7 @@ Transform:
   - {fileID: 1404581648}
   - {fileID: 987557443}
   - {fileID: 2114918172}
+  - {fileID: 500309175}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11939,6 +12027,7 @@ MonoBehaviour:
   floatingTextManager: {fileID: 1916195010}
   enemyList: []
   enemyPrefab: {fileID: 6199606947429371378, guid: 92933bec757a66843bc70ac5978127c5, type: 3}
+  bloodPS: {fileID: 2111155677154262330, guid: c367117a222a11d43aa8fcdf134d17fd, type: 3}
   money: 0
 --- !u!4 &2069246826
 Transform:
@@ -12312,8 +12401,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 2
-      minScalar: 1.75
+      scalar: 1.75
+      minScalar: 1.5
       maxCurve:
         serializedVersion: 2
         m_Curve:
