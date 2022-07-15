@@ -2,15 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public InputController playerControls;
+    private InputAction btn;
     public PlayerController player;
     public FloatingTextManager floatingTextManager;
     public List<GameObject> enemyList;
     public GameObject enemyPrefab;
     public ParticleSystem bloodPS;
+    public GameObject hud;
+    public Image goScreen;
+
+    public float playerDist;
+    public float playerMaxDist = 80f;
+    private bool gameOver = false;
+    private float gameOverFade = 2f;
+    private float gameOverTime;
 
     public int money;
 
@@ -23,6 +35,18 @@ public class GameManager : MonoBehaviour
         }
 
         instance = this;
+        playerControls = new InputController();
+    }
+
+    private void OnEnable()
+    {
+        btn = playerControls.Player.Button;
+        btn.Enable();
+    }
+
+    private void OnDisable()
+    {
+        btn.Disable();
     }
 
     // Start is called before the first frame update
@@ -34,6 +58,13 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        playerDist = Vector2.Distance(player.transform.position, Vector2.zero);
+
+        if (!gameOver) {
+            CheckPlayerDeath();
+        } else {
+            HandleGameOver();
+        }
         
     }
 
@@ -99,6 +130,28 @@ public class GameManager : MonoBehaviour
         if (angle.magnitude > 0) {
             var bs = ob.GetComponent<BloodPS>();
             bs.SetAngle(angle);
+        }
+    }
+
+    public void CheckPlayerDeath()
+    {
+        if (playerDist > playerMaxDist) {
+            gameOver = true;
+            gameOverTime = Time.time;
+            goScreen.enabled = true;
+        }
+    }
+
+    public void HandleGameOver()
+    {
+        float alpha = Mathf.Min(1f, ((Time.time - gameOverTime) / gameOverFade));
+        Debug.Log(alpha);
+        Color col = goScreen.color;
+        col = new Color(col.r, col.g, col.b, alpha);
+        goScreen.color = col;
+
+        if ((Time.time - gameOverTime > gameOverFade) && (btn.WasPressedThisFrame())){
+            SceneManager.LoadScene("Level_01");
         }
     }
 }
