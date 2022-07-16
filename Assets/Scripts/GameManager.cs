@@ -4,20 +4,24 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+
     public CameraController cam;
+
     public InputController playerControls;
     private InputAction btn;
     public PlayerController player;
+
     public FloatingTextManager floatingTextManager;
+    public HUDmanager hud;
+
     public List<GameObject> enemyList;
     public GameObject enemyPrefab;
     public ParticleSystem bloodPS;
-    public GameObject hud;
-    public Image goScreen;
 
     public Vector2 gameCenterPoint;
     public float minDistBetweenEnemies;
@@ -28,8 +32,8 @@ public class GameManager : MonoBehaviour
     public float playerDist;
     public float playerMaxDist;
     public bool gameOver;
-    private float levelOverFade = 2f;
-    private float levelOverTime;
+    public float levelOverFade = 2f;
+    public float levelOverTime;
     public bool levelWon;
 
     public int money;
@@ -64,7 +68,10 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        cam = Camera.main.GetComponent<CameraController>();
+        player = GameObject.Find("Player").GetComponent<PlayerController>();
         SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
+        hud.StartLevel("LEVEL " + gameLevel);
     }
 
     // Update is called once per frame
@@ -73,6 +80,7 @@ public class GameManager : MonoBehaviour
         playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
 
         if (!gameOver) {
+            CheckWinCondition();
             CheckPlayerDeath();
         } else {
             HandleGameOver();
@@ -83,16 +91,13 @@ public class GameManager : MonoBehaviour
     {
         gameLevel = 1;
 
-        gameCenterPoint = Vector2.up * 3f;
-        minDistBetweenEnemies = 5f;
+        gameCenterPoint = Vector2.up * 10f;
+        minDistBetweenEnemies = 2f;
         maxDistSpawn = 14f;
         enemiesThisLevel = 10;
         playerMaxDist = 80f;
         levelWon = false;
         gameOver = false;
-
-        cam = Camera.main.GetComponent<CameraController>();
-        player = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     public void ShowText(string msg, Vector3 position, Color color, float duration = 2.0f, float motion = 15.0f, int fontSize = 16)
@@ -102,12 +107,15 @@ public class GameManager : MonoBehaviour
 
     private void SpawnEnemies(int amount, float maxDist, Vector2 center, float minDistEnemy)
     {
+        int overload;
         Vector3 spawnPoint;
         for (int i = 0; i < amount; i++)
         {
+            overload = 1000;
             do {
                 spawnPoint = center + Random.insideUnitCircle * maxDist;
-            } while (DistanceNearestEnemy() < minDistEnemy);
+                overload--;
+            } while ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy));
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);
@@ -140,15 +148,15 @@ public class GameManager : MonoBehaviour
         return (output, distance);
     }
 
-    public float DistanceNearestEnemy()
+    public float DistanceNearestEnemy(Vector2 origin)
     {
-        Transform t = player.GetComponent<Transform>();
+        //Transform t = player.GetComponent<Transform>();
         float distance = Mathf.Infinity;
         float tempDist;
         
         foreach (var enemy in enemyList)
         {
-            tempDist = Vector3.Distance(t.position, enemy.GetComponent<Transform>().position);
+            tempDist = Vector3.Distance(origin, enemy.GetComponent<Transform>().position);
             if (tempDist < distance)
                 distance = tempDist;
         }
@@ -170,17 +178,13 @@ public class GameManager : MonoBehaviour
         if (playerDist > playerMaxDist) {
             gameOver = true;
             levelOverTime = Time.time;
-            goScreen.enabled = true;
+
+            hud.SetHud("GAME OVER");
         }
     }
 
     public void HandleGameOver()
     {
-        float alpha = Mathf.Min(1f, ((Time.time - levelOverTime) / levelOverFade));
-        Color col = goScreen.color;
-        col = new Color(col.r, col.g, col.b, alpha);
-        goScreen.color = col;
-
         if ((Time.time - levelOverTime > levelOverFade) && (btn.WasPressedThisFrame())){
             SceneManager.LoadScene("Level_01");
         }
@@ -190,6 +194,14 @@ public class GameManager : MonoBehaviour
     {
         if (enemyList.Count <= 0) {
             cam.isFollowing = false;
+            levelWon = true;
+
+            hud.SetHud("LEVEL " + gameLevel.ToString() + " WIN");
         }
+    }
+
+    public void HandleLevelWon()
+    {
+
     }
 }

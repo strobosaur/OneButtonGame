@@ -40,7 +40,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.instance.playerDist < GameManager.instance.playerMaxDist) {
+        if (GameManager.instance.levelWon || GameManager.instance.gameOver) {
             isFollowing = false;
         }
     }
