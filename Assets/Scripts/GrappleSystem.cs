@@ -92,7 +92,7 @@ public class GrappleSystem : MonoBehaviour
                 {
                     // 4
                     // Jump slightly to distance the player a little from the ground after grappling to something.
-                    //transform.GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, 2f), ForceMode2D.Impulse);
+                    transform.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-1f,1f), Random.Range(-1f,-1f)), ForceMode2D.Impulse);
                     grapplePositions.Add(hit.point);
                     grappleJoint.distance = Mathf.Max(3f, Vector2.Distance(playerPosition, hit.point));
                     grappleJoint.enabled = true;

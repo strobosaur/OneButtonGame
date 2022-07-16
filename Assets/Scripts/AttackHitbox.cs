@@ -8,7 +8,7 @@ public class AttackHitbox : Collidable
     public TrailRenderer attackPS1;
 
     private float lastAttack;
-    private float attackDuration = 1f;
+    private float attackDuration = 0.75f;
     private bool endAttack = false;
 
     protected override void Start()
