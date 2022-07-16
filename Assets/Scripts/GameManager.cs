@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     public float levelOverTime;
     public bool levelWon;
 
-    public int money;
+    public int score;
 
     private void Awake()
     {
@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
-        ResetGame();
+        //ResetGame();
         
         SceneManager.sceneLoaded += LoadState;
     }
@@ -82,6 +82,8 @@ public class GameManager : MonoBehaviour
 
         if (!gameOver && !levelWon) {
             CheckWinCondition();
+        } else if (levelWon) {
+            HandleLevelWin();
         }
 
         if (!gameOver && !levelWon) {
@@ -94,16 +96,28 @@ public class GameManager : MonoBehaviour
     // LOAD STATE SCENE MANAGEMENT
     public void LoadState(Scene s, LoadSceneMode mode)
     {
-        // RESET GAME MANAGER LEVEL PARAMETERS
-        ResetLevel();
-
         // FIND ALL OBJECT REFERENCES
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         cam = Camera.main.GetComponent<CameraController>();
         floatingTextManager = GameObject.Find("FloatingTextManager").GetComponent<FloatingTextManager>();
 
+        // FIND HUD OBJECT REFERENCES
         hud.goScreen = GameObject.Find("GameOverScreen").GetComponent<Image>();
         hud.screenText = GameObject.Find("BlackScreenText").GetComponent<TMP_Text>();
+
+        // CHECK FOR SAVE STATE
+        if (!PlayerPrefs.HasKey("SaveState"))
+        {
+            // RESET GAME MANAGER LEVEL PARAMETERS
+            ResetGame();
+        } else {
+            string[] saveData = PlayerPrefs.GetString("SaveState").Split(';');
+            score = int.Parse(saveData[0]);
+            gameLevel = int.Parse(saveData[1]);
+
+            HandleNewLevel();
+            PlayerPrefs.DeleteAll();
+        }
 
         // RESET HUD
         hud.StartLevel("LEVEL " + gameLevel);
@@ -113,6 +127,17 @@ public class GameManager : MonoBehaviour
         SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
     }
 
+    // LOAD STATE SCENE MANAGEMENT
+    public void SaveState()
+    {
+        string s = "";
+        s += score.ToString() + ";";
+        s += gameLevel.ToString();
+
+        PlayerPrefs.SetString("SaveState", s);
+    }
+
+    // TOTAL RESET OF GAME MANAGERS PARAMETERS
     public void ResetGame()
     {
         gameLevel = 1;
@@ -120,11 +145,12 @@ public class GameManager : MonoBehaviour
         gameCenterPoint = Vector2.up * 10f;
         minDistBetweenEnemies = 2f;
         maxDistSpawn = 14f;
-        enemiesThisLevel = 10;
+        enemiesThisLevel = 5;
 
         ResetLevel();
     }
 
+    // RESET LEVEL PARAMETERS
     public void ResetLevel()
     {
         playerMaxDist = 80f;
@@ -132,21 +158,20 @@ public class GameManager : MonoBehaviour
         gameOver = false;
     }
 
+    // SHOW FLOATING TEXT AT POSITION
     public void ShowText(string msg, Vector3 position, Color color, float duration = 2.0f, float motion = 15.0f, int fontSize = 16)
     {
         floatingTextManager.Show(msg, fontSize, color, position, new Vector3(0,motion,0), duration);
     }
 
+    // SPAWN ENEMIES WITH PARAMETERS
     private void SpawnEnemies(int amount, float maxDist, Vector2 center, float minDistEnemy)
     {
-        int overload;
         Vector3 spawnPoint;
         for (int i = 0; i < amount; i++)
         {
-            overload = 1000;
             do {
                 spawnPoint = center + Random.insideUnitCircle * maxDist;
-                overload--;
             } while ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy));
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
@@ -158,6 +183,7 @@ public class GameManager : MonoBehaviour
         gameCenterPoint = (center / 2);
     }
 
+    // FIND NEAREST ENEMY AND DELIVER OBJECT & DISTANCE
     public (GameObject, float) FindNearestEnemy()
     {
         Transform t = player.GetComponent<Transform>();
@@ -166,6 +192,7 @@ public class GameManager : MonoBehaviour
         int index = 0;
         GameObject output = null;
         
+        // LOOP THROUGH LIST OF ENEMY OBJECTS AND FIND SHORTEST DISTANCE
         for(int i = 0; i < enemyList.Count; i++)
         {
             tempDist = Vector3.Distance(t.localPosition, enemyList[i].transform.localPosition);
@@ -180,6 +207,7 @@ public class GameManager : MonoBehaviour
         return (output, distance);
     }
 
+    // FIND DISTANCE TO NEAREST ENEMY FROM GIVEN POINT
     public float DistanceNearestEnemy(Vector2 origin)
     {
         //Transform t = player.GetComponent<Transform>();
@@ -196,6 +224,7 @@ public class GameManager : MonoBehaviour
         return distance;
     }
 
+    // SPAWN BLOOD SPLASH PARTICLES
     public void SpawnBlood(Vector2 position, Vector2 angle = new Vector2())
     {
         var ob = Instantiate(bloodPS, position, Quaternion.identity);
@@ -205,6 +234,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // CHECK PLAYER DEATH CONDITIONS
     public void CheckPlayerDeath()
     {
         if (playerDist > playerMaxDist) {
@@ -215,13 +245,31 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // HANDLE GAME OVER
     public void HandleGameOver()
     {
+        // CHECK TIMER
         if ((Time.time - levelOverTime > levelOverFade) && (btn.WasPressedThisFrame())){
+            // DELETE ALL SAVE DATA
+            PlayerPrefs.DeleteAll();
+            ResetLevel();
             SceneManager.LoadScene("Level_01");
         }
     }
 
+    // HANDLE NEXT LEVEL
+    public void HandleLevelWin()
+    {
+        // CHECK TIMER
+        if ((Time.time - levelOverTime > levelOverFade) && (btn.WasPressedThisFrame())){
+            // SAVE DATA
+            SaveState();
+            ResetLevel();
+            SceneManager.LoadScene("Level_01");
+        }
+    }
+
+    // CHECK LEVEL WIN CONDITIONS
     public void CheckWinCondition()
     {
         if (enemyList.Count <= 0) {
@@ -232,13 +280,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetNextLevelParameters()
+    // HANDLE NEW LEVEL
+    public void HandleNewLevel()
     {
         gameLevel++;
-    }
-
-    public void HandleLevelWon()
-    {
-
+        enemiesThisLevel += Mathf.RoundToInt(gameLevel * 2.5f);
+        maxDistSpawn += gameLevel * 0.75f;
     }
 }
