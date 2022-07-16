@@ -110,7 +110,7 @@ public class PlayerController : Movable
     // Update is called once per frame
     void FixedUpdate()
     {
-        UpdateMotor(new Vector2(moveInput.x,0));
+        //UpdateMotor(new Vector2(moveInput.x,0));
     }
 
     private void PrepareJump(float input)

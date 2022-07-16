@@ -16,6 +16,8 @@ public class CameraController : MonoBehaviour
     private Vector2 movePos;
     private float targetDist;
 
+    public bool isFollowing;
+
     public void Awake()
     {
         if (CameraController.instance != null)
@@ -25,6 +27,8 @@ public class CameraController : MonoBehaviour
         }
 
         instance = this;
+
+        isFollowing = true;
     }
 
     // START
@@ -34,13 +38,20 @@ public class CameraController : MonoBehaviour
         lookAt = GameObject.Find(Globals.G_PLAYERNAME).transform;
     }
 
+    private void Update()
+    {
+        if (GameManager.instance.playerDist < GameManager.instance.playerMaxDist) {
+            isFollowing = false;
+        }
+    }
+
     // LATE UPDATE
     public void LateUpdate()
     {
         targetDist = Vector2.Distance(transform.position, lookAt.position);
         // CHECK DISTANCE TO TARGET OBJECT
         if (Vector3.Distance(transform.position, lookAt.position) > camBounds){
-            if (GameManager.instance.playerDist < GameManager.instance.playerMaxDist)
+            if (isFollowing)
             {
                 camTarget = lookAt.position * camDistance;
                 moveDelta = new Vector2(camTarget.x, camTarget.y);
