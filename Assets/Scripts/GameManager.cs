@@ -18,25 +18,27 @@ public class GameManager : MonoBehaviour
 
     public FloatingTextManager floatingTextManager;
     public HUDmanager hud;
+    public ScoreManager scoreManager;
 
     public List<GameObject> enemyList;
     public GameObject enemyPrefab;
     public ParticleSystem bloodPS;
 
     public Vector2 gameCenterPoint;
-    public float minDistBetweenEnemies;
-    public float maxDistSpawn;
+    private float minDistBetweenEnemies;
+    private float maxDistSpawn;
     public int enemiesThisLevel;
     public int gameLevel;
 
-    public float playerDist;
-    public float playerMaxDist;
+    private float playerDist;
+    private float playerMaxDist;
     public bool gameOver;
-    public float levelOverFade = 2f;
-    public float levelOverTime;
+    private float levelOverFade = 2f;
+    private float levelOverTime;
     public bool levelWon;
 
     public int score;
+    public int killsTotal;
 
     private void Awake()
     {
@@ -49,8 +51,6 @@ public class GameManager : MonoBehaviour
         playerControls = new InputController();
 
         DontDestroyOnLoad(gameObject);
-
-        //ResetGame();
         
         SceneManager.sceneLoaded += LoadState;
     }
@@ -69,9 +69,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        List<GameObject> enemyList = new List<GameObject>();
-        
-        //SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
+        List<GameObject> enemyList = new List<GameObject>();        
         hud.StartLevel("LEVEL " + gameLevel);
     }
 
@@ -105,6 +103,10 @@ public class GameManager : MonoBehaviour
         hud.goScreen = GameObject.Find("GameOverScreen").GetComponent<Image>();
         hud.screenText = GameObject.Find("BlackScreenText").GetComponent<TMP_Text>();
 
+        hud.killsText = GameObject.Find("fieldKills").GetComponent<TMP_Text>();
+        hud.multiplierText = GameObject.Find("fieldMultiplier").GetComponent<TMP_Text>();
+        hud.scoreText = GameObject.Find("fieldScore").GetComponent<TMP_Text>();
+
         // CHECK FOR SAVE STATE
         if (!PlayerPrefs.HasKey("SaveState"))
         {
@@ -114,6 +116,7 @@ public class GameManager : MonoBehaviour
             string[] saveData = PlayerPrefs.GetString("SaveState").Split(';');
             score = int.Parse(saveData[0]);
             gameLevel = int.Parse(saveData[1]);
+            killsTotal = int.Parse(saveData[2]);
 
             HandleNewLevel();
             PlayerPrefs.DeleteAll();
@@ -132,7 +135,8 @@ public class GameManager : MonoBehaviour
     {
         string s = "";
         s += score.ToString() + ";";
-        s += gameLevel.ToString();
+        s += gameLevel.ToString() + ";";
+        s += killsTotal.ToString();
 
         PlayerPrefs.SetString("SaveState", s);
     }
@@ -144,8 +148,11 @@ public class GameManager : MonoBehaviour
 
         gameCenterPoint = Vector2.up * 10f;
         minDistBetweenEnemies = 2f;
-        maxDistSpawn = 14f;
+        maxDistSpawn = 6f;
         enemiesThisLevel = 5;
+
+        score = 0;
+        killsTotal = 0;
 
         ResetLevel();
     }
@@ -168,19 +175,21 @@ public class GameManager : MonoBehaviour
     private void SpawnEnemies(int amount, float maxDist, Vector2 center, float minDistEnemy)
     {
         Vector3 spawnPoint;
+        float distOffset = 0;
         for (int i = 0; i < amount; i++)
         {
             do {
-                spawnPoint = center + Random.insideUnitCircle * maxDist;
+                spawnPoint = center + Random.insideUnitCircle * (maxDist + distOffset);
             } while ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy));
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);
             
             center.y += 1f;
+            distOffset += 1.0f;
         }
 
-        gameCenterPoint = (center / 2);
+        gameCenterPoint = center;
     }
 
     // FIND NEAREST ENEMY AND DELIVER OBJECT & DISTANCE
@@ -275,6 +284,7 @@ public class GameManager : MonoBehaviour
         if (enemyList.Count <= 0) {
             cam.isFollowing = false;
             levelWon = true;
+            levelOverTime = Time.time;
 
             hud.SetHud("LEVEL " + gameLevel.ToString() + " WIN");
         }
