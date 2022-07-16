@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public CameraController cam;
     public InputController playerControls;
     private InputAction btn;
     public PlayerController player;
@@ -18,11 +19,18 @@ public class GameManager : MonoBehaviour
     public GameObject hud;
     public Image goScreen;
 
+    public Vector2 gameCenterPoint;
+    public float minDistBetweenEnemies;
+    public float maxDistSpawn;
+    public int enemiesThisLevel;
+    public int gameLevel;
+
     public float playerDist;
-    public float playerMaxDist = 80f;
-    private bool gameOver = false;
-    private float gameOverFade = 2f;
-    private float gameOverTime;
+    public float playerMaxDist;
+    public bool gameOver;
+    private float levelOverFade = 2f;
+    private float levelOverTime;
+    public bool levelWon;
 
     public int money;
 
@@ -36,6 +44,10 @@ public class GameManager : MonoBehaviour
 
         instance = this;
         playerControls = new InputController();
+
+        DontDestroyOnLoad(gameObject);
+
+        ResetGame();
     }
 
     private void OnEnable()
@@ -52,20 +64,35 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SpawnEnemies(20, 14, new Vector2(0, 3));
+        SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
     }
 
     // Update is called once per frame
     void Update()
     {
-        playerDist = Vector2.Distance(player.transform.position, Vector2.zero);
+        playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
 
         if (!gameOver) {
             CheckPlayerDeath();
         } else {
             HandleGameOver();
-        }
-        
+        }        
+    }
+
+    public void ResetGame()
+    {
+        gameLevel = 1;
+
+        gameCenterPoint = Vector2.up * 3f;
+        minDistBetweenEnemies = 5f;
+        maxDistSpawn = 14f;
+        enemiesThisLevel = 10;
+        playerMaxDist = 80f;
+        levelWon = false;
+        gameOver = false;
+
+        cam = Camera.main.GetComponent<CameraController>();
+        player = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     public void ShowText(string msg, Vector3 position, Color color, float duration = 2.0f, float motion = 15.0f, int fontSize = 16)
@@ -73,20 +100,22 @@ public class GameManager : MonoBehaviour
         floatingTextManager.Show(msg, fontSize, color, position, new Vector3(0,motion,0), duration);
     }
 
-    private void SpawnEnemies(int amount, float minDist, Vector2 center)
+    private void SpawnEnemies(int amount, float maxDist, Vector2 center, float minDistEnemy)
     {
         Vector3 spawnPoint;
         for (int i = 0; i < amount; i++)
         {
             do {
-                spawnPoint = center + Random.insideUnitCircle * minDist;
-            } while (spawnPoint.y < center.y);
+                spawnPoint = center + Random.insideUnitCircle * maxDist;
+            } while (DistanceNearestEnemy() < minDistEnemy);
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);
             
             center.y += 1f;
         }
+
+        gameCenterPoint = (center / 2);
     }
 
     public (GameObject, float) FindNearestEnemy()
@@ -140,20 +169,27 @@ public class GameManager : MonoBehaviour
     {
         if (playerDist > playerMaxDist) {
             gameOver = true;
-            gameOverTime = Time.time;
+            levelOverTime = Time.time;
             goScreen.enabled = true;
         }
     }
 
     public void HandleGameOver()
     {
-        float alpha = Mathf.Min(1f, ((Time.time - gameOverTime) / gameOverFade));
+        float alpha = Mathf.Min(1f, ((Time.time - levelOverTime) / levelOverFade));
         Color col = goScreen.color;
         col = new Color(col.r, col.g, col.b, alpha);
         goScreen.color = col;
 
-        if ((Time.time - gameOverTime > gameOverFade) && (btn.WasPressedThisFrame())){
+        if ((Time.time - levelOverTime > levelOverFade) && (btn.WasPressedThisFrame())){
             SceneManager.LoadScene("Level_01");
+        }
+    }
+
+    public void CheckWinCondition()
+    {
+        if (enemyList.Count <= 0) {
+            cam.isFollowing = false;
         }
     }
 }
