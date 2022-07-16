@@ -76,6 +76,7 @@ public class PlayerController : Movable
         base.Start();
         moveSpd = p1Spd;
         lastJump = Time.time;
+        //Physics.IgnoreLayerCollision(8,7, true);
     }
 
     protected void Update()
@@ -161,14 +162,16 @@ public class PlayerController : Movable
             if (!isGrappling)
                 grapplingEnemy = nearestEnemy;
 
+            if (grapplingEnemy == null) {
+                grappleSystem.ResetRope();
+                isGrappling = false;
+                return;
+            }
+
             grappleSystem.UpdateGrappleSystem(grapplingEnemy.transform.position);
 
             isGrappling = true;
-            Debug.DrawLine(grapplingEnemy.transform.position, transform.position, Color.red, 1f);
-            // lineRenderer.SetPosition(0,rb.transform.localPosition);            
-            // lineRenderer.SetPosition(1,nearestEnemy.transform.localPosition);
             
-            //rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x,0f,Globals.G_INERTIA),-0.1f);
             PrepareJump(jumpBuildSpd);
         } else if (enemyInRange && btn.WasReleasedThisFrame()) {
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
