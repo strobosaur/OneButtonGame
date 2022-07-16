@@ -41,6 +41,7 @@ public class PlayerController : Movable
     protected float distToGround;
 
     public ParticleSystem flashPS;
+    public ParticleSystem jumpPS;
 
     void Awake()
     {
@@ -49,6 +50,7 @@ public class PlayerController : Movable
         maxGrapplingRange = 6f;
         minGrapplingRange = 0.5f;
         flashPS.Stop();
+        jumpPS.Stop();
     }
 
     private void OnEnable()
@@ -129,6 +131,7 @@ public class PlayerController : Movable
             lastJump = Time.time;
             isJumping = true;
             isColliding = false;
+            jumpPS.Play();
         } else {
             jumpForce = 0f;
         }
