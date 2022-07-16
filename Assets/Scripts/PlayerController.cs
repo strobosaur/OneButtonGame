@@ -84,29 +84,33 @@ public class PlayerController : Movable
     protected void Update()
     {        
         //moveInput = move.ReadValue<Vector2>();
-        
-        if (!isGrappling && !isAttacking) {
-            if (btn.WasReleasedThisFrame()) {
-                PlayerJump(nearestEnemyDir);
-            } else if (btn.IsPressed()) {
-                PrepareJump(jumpBuildSpd);
+        if (!GameManager.instance.levelWon && !GameManager.instance.gameOver)
+        {        
+            if (!isGrappling && !isAttacking) {
+                if (btn.WasReleasedThisFrame()) {
+                    PlayerJump(nearestEnemyDir);
+                } else if (btn.IsPressed()) {
+                    PrepareJump(jumpBuildSpd);
+                }
             }
-        }
-        
-        if (!isGrappling) 
-            SetNearestEnemy();
+            
+            if (!isGrappling) 
+                SetNearestEnemy();
 
-        CheckNearestEnemy();
-        if (enemyInRange)
-            GrappleNearestEnemy();
+            CheckNearestEnemy();
+            if (enemyInRange)
+                GrappleNearestEnemy();
 
-        if (isAttacking){
-            Attacking();
-        }
+            if (isAttacking){
+                Attacking();
+            }
 
-        if ((Time.time - lastAttack > attackDuration)) {
-            flashPS.Stop();
-            StopAttack();
+            if ((Time.time - lastAttack > attackDuration)) {
+                flashPS.Stop();
+                StopAttack();
+            }
+        } else {
+            ResetPlayer();
         }
     }
 
@@ -114,6 +118,27 @@ public class PlayerController : Movable
     void FixedUpdate()
     {
         //UpdateMotor(new Vector2(moveInput.x,0));
+    }
+
+    // RESET PLAYER
+    private void ResetPlayer()
+    {
+        flashPS.Stop();
+        jumpPS.Stop();
+
+        isColliding = false;
+        isGrappling = false;
+        isJumping = false;
+        isAttacking = false;
+        enemyInRange = false;
+        
+        jumpForce = 0;
+
+        nearestEnemy = null;
+        grapplingEnemy = null;
+        attackingEnemy = null;
+
+        grappleSystem.ResetRope();
     }
 
     private void PrepareJump(float input)
