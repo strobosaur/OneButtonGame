@@ -59,6 +59,7 @@ public class Enemy : Movable
         GameManager.instance.ShowText("+1 KILL!", transform.position, Color.white, 2, 15, 16);
         GameManager.instance.enemyList.Remove(gameObject);
         GameManager.instance.SpawnBlood(transform.position);
+        GameManager.instance.scoreManager.NewKill(transform.position + Vector3.up);
         Destroy(gameObject);
     }
 }

@@ -9,6 +9,10 @@ public class HUDmanager : MonoBehaviour
     public Image goScreen;
     public TMP_Text screenText;
 
+    public TMP_Text killsText;
+    public TMP_Text multiplierText;
+    public TMP_Text scoreText;
+
     private float screenFadeStartTime;
     private float screenFadeDuration = 2f;
     private float screenFadeFactor;
@@ -30,6 +34,9 @@ public class HUDmanager : MonoBehaviour
 
     private void Update()
     {
+        // UPDATE HUD
+        UpdateHudText();
+
         if (showHud) {
             BlackScreenFade();
         } else {
@@ -82,5 +89,12 @@ public class HUDmanager : MonoBehaviour
         goScreen.enabled = true;
         screenText.enabled = true;
         screenText.text = msg;
+    }
+
+    public void UpdateHudText()
+    {
+        scoreText.text = GameManager.instance.score.ToString();
+        multiplierText.text = GameManager.instance.scoreManager.scoreMultiplier.ToString();
+        killsText.text = GameManager.instance.killsTotal.ToString();
     }
 }
