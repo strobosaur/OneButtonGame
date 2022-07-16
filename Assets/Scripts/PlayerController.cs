@@ -23,7 +23,7 @@ public class PlayerController : Movable
 
     public bool isAttacking;
     private float lastAttack;
-    private float attackDuration = 1f;
+    private float attackDuration = 0.75f;
     private float attackDamping = 5f;
     private Vector2 attackTarget;
     public GameObject attackingEnemy;
@@ -32,8 +32,8 @@ public class PlayerController : Movable
     public float p1Spd = 5.0f;
 
     private float jumpForce;
-    private float jumpBuildSpd = 0.05f;
-    private float maxJumpForce = 20.0f;
+    private float jumpBuildSpd = 0.1f;
+    private float maxJumpForce = 30.0f;
     private float lastJump;
     private float jumpCooldown = 0.5f;
     public bool isJumping = false;
@@ -47,7 +47,7 @@ public class PlayerController : Movable
     {
         playerControls = new InputController();
         rb = GetComponent<Rigidbody2D>();
-        maxGrapplingRange = 6f;
+        maxGrapplingRange = 5f;
         minGrapplingRange = 0.5f;
         flashPS.Stop();
         jumpPS.Stop();
@@ -78,7 +78,7 @@ public class PlayerController : Movable
         base.Start();
         moveSpd = p1Spd;
         lastJump = Time.time;
-        //Physics.IgnoreLayerCollision(8,7, true);
+        Physics.IgnoreLayerCollision(8,7, true);
     }
 
     protected void Update()
