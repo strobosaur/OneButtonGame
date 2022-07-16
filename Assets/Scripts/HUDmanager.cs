@@ -10,13 +10,20 @@ public class HUDmanager : MonoBehaviour
     public Image goScreen;
     public TMP_Text screenText;
 
-    private float fadeStartTime;
-    private float fadeDuration = 2f;
+    private float screenFadeStartTime;
+    private float screenFadeDuration = 2f;
+    private float screenFadeFactor;
+
+    private float textFadeStartTime;
+    private float textFadeDuration = 3f;
+    private float textFadeFactor;
+
     private bool showHud;
 
     private void Awake()
     {
-        fadeStartTime = Time.time;
+        screenFadeStartTime = Time.time;
+        textFadeStartTime = Time.time;
         showHud = false;
         goScreen.enabled = false;
         screenText.enabled = true;
@@ -34,37 +41,35 @@ public class HUDmanager : MonoBehaviour
     private void BlackScreenFade(bool fadeIn = true)
     {
         if ((goScreen.enabled) || (screenText.enabled)) {
-            float alpha1;
-            float alpha2;
-
             if (fadeIn){
-                alpha1 = Mathf.Min(1f, ((Time.time - fadeStartTime) / fadeDuration));
-                alpha2 = Mathf.Min(1f, ((Time.time - (fadeStartTime * 3)) / (fadeDuration * 3)));
+                screenFadeFactor = Mathf.Min(1f, ((Time.time - screenFadeStartTime) / screenFadeDuration));
+                textFadeFactor = Mathf.Min(1f, ((Time.time - textFadeStartTime) / textFadeDuration));
             } else {
-                alpha1 = Mathf.Max(0f, 1f - ((Time.time - fadeStartTime) / fadeDuration));
-                alpha2 = Mathf.Max(0f, 1f - ((Time.time - (fadeStartTime * 3)) / (fadeDuration * 3)));
+                screenFadeFactor = Mathf.Max(0f, 1f - ((Time.time - screenFadeStartTime) / screenFadeDuration));
+                textFadeFactor = Mathf.Max(0f, 1f - ((Time.time - textFadeStartTime) / textFadeDuration));
 
-                if (alpha1 <= 0) goScreen.enabled = false;                
-                if (alpha2 <= 0) screenText.enabled = false;
+                if (screenFadeFactor <= 0) goScreen.enabled = false;                
+                if (textFadeFactor <= 0) screenText.enabled = false;
             }
 
             Color col = goScreen.color;
-            col = new Color(col.r, col.g, col.b, alpha1);
+            col = new Color(col.r, col.g, col.b, screenFadeFactor);
             goScreen.color = col;
-
-            screenText.alpha = alpha2;
+            
+            screenText.alpha = textFadeFactor;
         }
     }
 
     public void SetHud(string text, bool show = true)
     {
-        fadeStartTime = Time.time;
+        screenFadeStartTime = Time.time;
+        textFadeStartTime = Time.time;
         screenText.text = text;
 
         if (show) {
             showHud = true;
             goScreen.enabled = true;
-            screenText.enabled = false;
+            screenText.enabled = true;
         } else {
             showHud = false;
         }
@@ -72,7 +77,8 @@ public class HUDmanager : MonoBehaviour
 
     public void StartLevel(string msg)
     {
-        fadeStartTime = Time.time;
+        screenFadeStartTime = Time.time;
+        textFadeStartTime = Time.time;
         showHud = false;
         goScreen.enabled = true;
         screenText.enabled = true;
