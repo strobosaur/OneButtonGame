@@ -40,8 +40,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (GameManager.instance != null)
-        {
+        if (GameManager.instance != null) {
             Destroy(gameObject);
             return;
         }
@@ -51,10 +50,9 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
-        cam = Camera.main.GetComponent<CameraController>();
-        player = GameObject.Find("Player").GetComponent<PlayerController>();
-
         ResetGame();
+        
+        SceneManager.sceneLoaded += LoadState;
     }
 
     private void OnEnable()
@@ -71,6 +69,8 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        List<GameObject> enemyList = new List<GameObject>();
+        
         SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
         hud.StartLevel("LEVEL " + gameLevel);
     }
@@ -91,6 +91,21 @@ public class GameManager : MonoBehaviour
         }        
     }
 
+    public void LoadState(Scene s, LoadSceneMode mode)
+    {
+        ResetLevel();
+
+        player = GameObject.Find("Player").GetComponent<PlayerController>();
+        cam = Camera.main.GetComponent<CameraController>();
+        floatingTextManager = GameObject.Find("FloatingTextManager").GetComponent<FloatingTextManager>();
+        
+        hud.goScreen = GameObject.Find("GameOverScreen").GetComponent<Image>();
+        hud.screenText = GameObject.Find("BlackScreenText").GetComponent<TMP_Text>();
+
+        enemyList.Clear();
+        SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
+    }
+
     public void ResetGame()
     {
         gameLevel = 1;
@@ -99,6 +114,12 @@ public class GameManager : MonoBehaviour
         minDistBetweenEnemies = 2f;
         maxDistSpawn = 14f;
         enemiesThisLevel = 10;
+
+        ResetLevel();
+    }
+
+    public void ResetLevel()
+    {
         playerMaxDist = 80f;
         levelWon = false;
         gameOver = false;
@@ -202,6 +223,11 @@ public class GameManager : MonoBehaviour
 
             hud.SetHud("LEVEL " + gameLevel.ToString() + " WIN");
         }
+    }
+
+    public void SetNextLevelParameters()
+    {
+        gameLevel++;
     }
 
     public void HandleLevelWon()

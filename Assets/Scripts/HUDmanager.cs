@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class HUDmanager : MonoBehaviour
 {
-    public GameObject hud;
     public Image goScreen;
     public TMP_Text screenText;
 
