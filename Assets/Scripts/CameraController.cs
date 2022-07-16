@@ -37,8 +37,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    // LATE UPDATE
-    public void LateUpdate()
+    private void FixedUpdate()
     {
         targetDist = Vector2.Distance(transform.position, lookAt.position);
         // CHECK DISTANCE TO TARGET OBJECT
@@ -49,8 +48,13 @@ public class CameraController : MonoBehaviour
                 moveDelta = new Vector2(camTarget.x, camTarget.y);
             }
 
-            movePos = Vector2.Lerp(movePos, moveDelta, camSpd + (targetDist / 1000f));
-            transform.position = new Vector3(movePos.x, movePos.y, transform.position.z);
-        }        
+            movePos = Vector2.Lerp(movePos, moveDelta, camSpd + (targetDist / 100f));
+        }
+    }
+
+    // LATE UPDATE
+    public void LateUpdate()
+    {
+        transform.position = new Vector3(movePos.x, movePos.y, transform.position.z);
     }
 }

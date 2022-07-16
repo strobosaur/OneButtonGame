@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
     {
         List<GameObject> enemyList = new List<GameObject>();
         
-        SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
+        //SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
         hud.StartLevel("LEVEL " + gameLevel);
     }
 
@@ -91,17 +91,24 @@ public class GameManager : MonoBehaviour
         }        
     }
 
+    // LOAD STATE SCENE MANAGEMENT
     public void LoadState(Scene s, LoadSceneMode mode)
     {
+        // RESET GAME MANAGER LEVEL PARAMETERS
         ResetLevel();
 
+        // FIND ALL OBJECT REFERENCES
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         cam = Camera.main.GetComponent<CameraController>();
         floatingTextManager = GameObject.Find("FloatingTextManager").GetComponent<FloatingTextManager>();
-        
+
         hud.goScreen = GameObject.Find("GameOverScreen").GetComponent<Image>();
         hud.screenText = GameObject.Find("BlackScreenText").GetComponent<TMP_Text>();
 
+        // RESET HUD
+        hud.StartLevel("LEVEL " + gameLevel);
+
+        // SPAN NEW ENEMIES
         enemyList.Clear();
         SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
     }
