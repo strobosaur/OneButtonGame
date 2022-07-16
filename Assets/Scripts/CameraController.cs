@@ -20,14 +20,6 @@ public class CameraController : MonoBehaviour
 
     public void Awake()
     {
-        if (CameraController.instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        instance = this;
-
         isFollowing = true;
     }
 
