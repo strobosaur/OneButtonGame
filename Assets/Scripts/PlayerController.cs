@@ -185,7 +185,7 @@ public class PlayerController : Movable
 
     protected void GrappleNearestEnemy()
     {
-        if (enemyInRange && btn.IsPressed())
+        if (enemyInRange && btn.WasPerformedThisFrame())
         {
             if (!isGrappling)
                 grapplingEnemy = nearestEnemy;
@@ -199,7 +199,9 @@ public class PlayerController : Movable
             grappleSystem.UpdateGrappleSystem(grapplingEnemy.transform.position);
 
             isGrappling = true;
-            
+        }
+           
+        if (isGrappling && btn.IsPressed()) {
             PrepareJump(jumpBuildSpd);
         } else if (enemyInRange && btn.WasReleasedThisFrame()) {
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
