@@ -90,12 +90,11 @@ public class GrappleSystem : MonoBehaviour
                 grappleAttached = true;
                 if (!grapplePositions.Contains(hit.point))
                 {
-                    Debug.Log(grappleAttached);
                     // 4
                     // Jump slightly to distance the player a little from the ground after grappling to something.
-                    transform.GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, 2f), ForceMode2D.Impulse);
+                    //transform.GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, 2f), ForceMode2D.Impulse);
                     grapplePositions.Add(hit.point);
-                    grappleJoint.distance = Vector2.Distance(playerPosition, hit.point);
+                    grappleJoint.distance = Mathf.Min(3f, Vector2.Distance(playerPosition, hit.point));
                     grappleJoint.enabled = true;
                     grappleHingeAnchorSprite.enabled = true;
                 }

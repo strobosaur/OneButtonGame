@@ -47,7 +47,7 @@ public class PlayerController : Movable
         playerControls = new InputController();
         rb = GetComponent<Rigidbody2D>();
         maxGrapplingRange = 6f;
-        minGrapplingRange = 3f;
+        minGrapplingRange = 0.5f;
         flashPS.Stop();
     }
 

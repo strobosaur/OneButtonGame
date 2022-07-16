@@ -51,6 +51,9 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
+        cam = Camera.main.GetComponent<CameraController>();
+        player = GameObject.Find("Player").GetComponent<PlayerController>();
+
         ResetGame();
     }
 
@@ -68,8 +71,6 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cam = Camera.main.GetComponent<CameraController>();
-        player = GameObject.Find("Player").GetComponent<PlayerController>();
         SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
         hud.StartLevel("LEVEL " + gameLevel);
     }
@@ -79,10 +80,13 @@ public class GameManager : MonoBehaviour
     {
         playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
 
-        if (!gameOver) {
+        if (!gameOver && !levelWon) {
             CheckWinCondition();
+        }
+
+        if (!gameOver && !levelWon) {
             CheckPlayerDeath();
-        } else {
+        } else if (gameOver) {
             HandleGameOver();
         }        
     }

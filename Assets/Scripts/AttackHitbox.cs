@@ -5,6 +5,8 @@ using UnityEngine;
 public class AttackHitbox : Collidable
 {
     public PlayerController player;
+    public TrailRenderer attackPS1;
+
     private float lastAttack;
     private float attackDuration = 1f;
     private bool endAttack = false;
@@ -23,6 +25,12 @@ public class AttackHitbox : Collidable
                 boxCollider.enabled = false;
             }
         }
+
+        if (boxCollider.enabled) {
+            attackPS1.emitting = true;
+        } else {
+            attackPS1.emitting = false;
+        }
     }
 
     public void Attack()
@@ -33,7 +41,6 @@ public class AttackHitbox : Collidable
 
     public void Passive()
     {
-        //boxCollider.enabled = false;
         if (!endAttack) {
             endAttack = true;
             lastAttack = Time.time;
