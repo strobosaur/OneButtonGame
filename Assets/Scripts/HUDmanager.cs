@@ -97,4 +97,20 @@ public class HUDmanager : MonoBehaviour
         multiplierText.text = GameManager.instance.scoreManager.scoreMultiplier.ToString();
         killsText.text = GameManager.instance.killsTotal.ToString();
     }
+
+    public void DisplayHighscores()
+    {
+        showHud = true;
+        goScreen.enabled = true;
+        screenText.enabled = true;
+        string hsString = "";
+
+        List<int> hsList = GameManager.instance.scoreManager.highscoreList;
+        for (int i = 0; i < hsList.Count; i++)
+        {
+            hsString += (i+1).ToString() + " - " + hsList[i].ToString() + "\n";
+        }
+
+        screenText.text = hsString;
+    }
 }

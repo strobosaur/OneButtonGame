@@ -37,6 +37,10 @@ public class GameManager : MonoBehaviour
     private float levelOverTime;
     public bool levelWon;
 
+    private bool showHighscore = false;
+    public float highscoreTime;
+    public float highScoreFade = 2f;
+
     public int score;
     public int killsTotal;
 
@@ -144,9 +148,10 @@ public class GameManager : MonoBehaviour
     // TOTAL RESET OF GAME MANAGERS PARAMETERS
     public void ResetGame()
     {
+        PlayerPrefs.DeleteAll();
+
         gameLevel = 1;
 
-        gameCenterPoint = Vector2.up * 10f;
         minDistBetweenEnemies = 2f;
         maxDistSpawn = 6f;
         enemiesThisLevel = 5;
@@ -160,7 +165,8 @@ public class GameManager : MonoBehaviour
     // RESET LEVEL PARAMETERS
     public void ResetLevel()
     {
-        playerMaxDist = 80f;
+        gameCenterPoint = Vector2.up * 10f;
+        playerMaxDist = 100f;
         levelWon = false;
         gameOver = false;
     }
@@ -185,11 +191,11 @@ public class GameManager : MonoBehaviour
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);
             
-            center.y += 1f;
+            center.y += 0.5f;
             distOffset += 1.0f;
         }
 
-        gameCenterPoint = center;
+        gameCenterPoint = (center / 2);
     }
 
     // FIND NEAREST ENEMY AND DELIVER OBJECT & DISTANCE
@@ -249,6 +255,8 @@ public class GameManager : MonoBehaviour
         if (playerDist > playerMaxDist) {
             gameOver = true;
             levelOverTime = Time.time;
+            scoreManager.highscoreList.Add(score);
+            scoreManager.highscoreList.Sort();
 
             hud.SetHud("GAME OVER");
         }
@@ -258,8 +266,12 @@ public class GameManager : MonoBehaviour
     public void HandleGameOver()
     {
         // CHECK TIMER
-        if ((Time.time - levelOverTime > levelOverFade) && (btn.WasPressedThisFrame())){
+        if ((!showHighscore) && (Time.time - levelOverTime > levelOverFade) && (btn.WasPressedThisFrame())){
+            showHighscore = true;
+            hud.DisplayHighscores();
+        } else if ((showHighscore) && (Time.time - highscoreTime > highScoreFade) && (btn.WasPressedThisFrame())) {
             // DELETE ALL SAVE DATA
+            showHighscore = false;
             PlayerPrefs.DeleteAll();
             ResetLevel();
             SceneManager.LoadScene("Level_01");
@@ -296,5 +308,6 @@ public class GameManager : MonoBehaviour
         gameLevel++;
         enemiesThisLevel += Mathf.RoundToInt(gameLevel * 2.5f);
         maxDistSpawn += gameLevel * 0.75f;
+        minDistBetweenEnemies = 2f;
     }
 }
