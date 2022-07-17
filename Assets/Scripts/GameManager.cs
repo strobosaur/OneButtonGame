@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     private float levelOverFade = 2f;
     private float levelOverTime;
     public bool levelWon;
+    public bool gameStart;
 
     private bool showHighscore = false;
     public float highscoreTime;
@@ -80,20 +81,26 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
-        playerDist = DistanceNearestEnemy(player.transform.position);
+        if (gameStart)
+        {
+            //playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
+            playerDist = DistanceNearestEnemy(player.transform.position);
 
-        if (!gameOver && !levelWon) {
-            CheckWinCondition();
-        } else if (levelWon) {
-            HandleLevelWin();
+            if (!gameOver && !levelWon) {
+                CheckWinCondition();
+            } else if (levelWon) {
+                HandleLevelWin();
+            }
+
+            if (!gameOver && !levelWon) {
+                CheckPlayerDeath();
+            } else if (gameOver) {
+                HandleGameOver();
+            } 
+        } else if (!gameStart && btn.WasPressedThisFrame()) {
+            gameOver = false;
+            gameStart = true;
         }
-
-        if (!gameOver && !levelWon) {
-            CheckPlayerDeath();
-        } else if (gameOver) {
-            HandleGameOver();
-        }        
     }
 
     // LOAD STATE SCENE MANAGEMENT
@@ -167,9 +174,10 @@ public class GameManager : MonoBehaviour
     public void ResetLevel()
     {
         gameCenterPoint = Vector2.up * 10f;
-        playerMaxDist = 60f;
+        playerMaxDist = 50f;
         levelWon = false;
         gameOver = false;
+        gameStart = false;
     }
 
     // SHOW FLOATING TEXT AT POSITION
@@ -297,6 +305,7 @@ public class GameManager : MonoBehaviour
         if (enemyList.Count <= 0) {
             cam.isFollowing = false;
             levelWon = true;
+            gameOver = false;
             levelOverTime = Time.time;
 
             hud.SetHud("LEVEL " + gameLevel.ToString() + " WIN");
