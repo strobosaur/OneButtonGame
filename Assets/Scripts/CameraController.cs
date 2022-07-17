@@ -34,6 +34,8 @@ public class CameraController : MonoBehaviour
     {
         if (GameManager.instance.levelWon || GameManager.instance.gameOver) {
             isFollowing = false;
+        } else {
+            isFollowing = true;
         }
     }
 

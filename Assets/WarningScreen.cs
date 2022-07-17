@@ -32,12 +32,14 @@ public class WarningScreen : MonoBehaviour
 
         if (!GameManager.instance.gameOver && !GameManager.instance.levelWon)
         {
-            if (playerDist > (playerMaxDist / 2)) {
+            if (playerDist > (playerMaxDist * 0.66f)) {
                 screen.enabled = true;
                 UpdateScreen();
             } else {
                 screen.enabled = false;
             }
+        } else {
+            screen.enabled = false;
         }
     }
 
@@ -48,7 +50,7 @@ public class WarningScreen : MonoBehaviour
         }
 
         flashFactor1 = Mathf.Max(0f, 1f - ((Time.time - flashTime) / flashDuration));
-        flashFactor2 = Mathf.Max(0f, (playerDist - (playerMaxDist / 2)) / (playerMaxDist / 2));
+        flashFactor2 = Mathf.Max(0f, (playerDist - (playerMaxDist * 0.66f)) / (playerMaxDist / 0.66f));
 
         Color col = screen.color;
 
