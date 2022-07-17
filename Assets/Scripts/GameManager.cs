@@ -30,8 +30,8 @@ public class GameManager : MonoBehaviour
     public int enemiesThisLevel;
     public int gameLevel;
 
-    private float playerDist;
-    private float playerMaxDist;
+    public float playerDist;
+    public float playerMaxDist;
     public bool gameOver;
     private float levelOverFade = 2f;
     private float levelOverTime;
@@ -80,7 +80,8 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
+        //playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
+        playerDist = DistanceNearestEnemy(player.transform.position);
 
         if (!gameOver && !levelWon) {
             CheckWinCondition();
@@ -166,7 +167,7 @@ public class GameManager : MonoBehaviour
     public void ResetLevel()
     {
         gameCenterPoint = Vector2.up * 10f;
-        playerMaxDist = 100f;
+        playerMaxDist = 60f;
         levelWon = false;
         gameOver = false;
     }
