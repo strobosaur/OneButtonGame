@@ -5,7 +5,7 @@ using UnityEngine;
 public class ScoreManager : MonoBehaviour
 {
     private float lastKill;
-    private float lastKillDuration = 2.0f;
+    private float lastKillDuration = 3.0f;
     private float multiplierDuration = 4.0f;
     public float scoreMultiplier = 1.0f;
     public int killStreak = 0;
@@ -13,6 +13,8 @@ public class ScoreManager : MonoBehaviour
     public int baseScore = 10;
 
     public int scoreTotal;
+
+    public List<int> highscoreList = new List<int>();
 
     private void Awake()
     {
@@ -55,7 +57,7 @@ public class ScoreManager : MonoBehaviour
         if (Time.time - lastKill < lastKillDuration)
         {
             killStreak++;
-            scoreMultiplier *= 1.75f;
+            scoreMultiplier = Mathf.Min(1000f,((scoreMultiplier * 1.5f) + (0.25f * killStreak)));
         }
 
         lastKill = Time.time;
