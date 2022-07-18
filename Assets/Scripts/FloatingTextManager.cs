@@ -16,11 +16,11 @@ public class FloatingTextManager : MonoBehaviour
         FloatingText floatingText = GetFloatingText();
 
         floatingText.txt.text = msg;
-        floatingText.txt.fontSize = fontSize;
+        floatingText.txt.fontSize = fontSize * Globals.G_SCALE_TO_HD;
         floatingText.txt.color = color;
 
         floatingText.go.transform.position = Camera.main.WorldToScreenPoint(position);
-        floatingText.motion = motion;
+        floatingText.motion = motion * Globals.G_SCALE_TO_HD;
         floatingText.duration = duration;
 
         floatingText.Show();

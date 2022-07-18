@@ -40,7 +40,14 @@ public class GrappleSystem : MonoBehaviour
     void Update()
     {
         if (playerController.isGrappling)
-            UpdateGrappleSystem(playerController.grapplingEnemy.transform.position);
+        {
+            if (playerController.grapplingEnemy != null) {
+                UpdateGrappleSystem(playerController.grapplingEnemy.transform.position);
+            } else {
+                ResetRope();
+                return;
+            }
+        }
 
         UpdateGrapplePositions();
     }
