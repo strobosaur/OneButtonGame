@@ -6,6 +6,8 @@ public class CameraController : MonoBehaviour
 {
     public static CameraController instance;
 
+    public ParticleSystem dustPS;
+
     public Transform lookAt;
     public float camSpd = 0.00625f;
     public float camBounds = 0.00016f;
@@ -26,7 +28,6 @@ public class CameraController : MonoBehaviour
     // START
     public void Start()
     {
-        //DontDestroyOnLoad(gameObject);
         lookAt = GameObject.Find(Globals.G_PLAYERNAME).transform;
     }
 
@@ -41,13 +42,17 @@ public class CameraController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        targetDist = Vector2.Distance(transform.position, lookAt.position);
         // CHECK DISTANCE TO TARGET OBJECT
+        targetDist = Vector2.Distance(transform.position, lookAt.position);
+        
         if (Vector3.Distance(transform.position, lookAt.position) > camBounds){
             if (isFollowing)
             {
                 camTarget = lookAt.position * camDistance;
                 moveDelta = new Vector2(camTarget.x, camTarget.y);
+                dustPS.transform.position = camTarget;
+            } else {
+                dustPS.transform.position = transform.position;
             }
 
             movePos = Vector2.Lerp(movePos, moveDelta, camSpd + (targetDist / 100f));

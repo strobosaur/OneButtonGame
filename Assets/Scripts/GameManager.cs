@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     public int enemiesThisLevel;
     public int gameLevel;
 
+    [HideInInspector]
     public float playerDist;
     public float playerMaxDist;
     public bool gameOver;
@@ -39,7 +40,9 @@ public class GameManager : MonoBehaviour
     public bool gameStart;
 
     private bool showHighscore = false;
+    [HideInInspector]
     public float highscoreTime;
+    [HideInInspector]
     public float highScoreFade = 2f;
 
     public int score;
@@ -266,6 +269,7 @@ public class GameManager : MonoBehaviour
             levelOverTime = Time.time;
             scoreManager.highscoreList.Add(score);
             scoreManager.highscoreList.Sort();
+            scoreManager.highscoreList.Reverse();
 
             hud.SetHud("GAME OVER");
         }
@@ -316,8 +320,14 @@ public class GameManager : MonoBehaviour
     public void HandleNewLevel()
     {
         gameLevel++;
-        enemiesThisLevel += Mathf.RoundToInt(gameLevel * 2.5f);
-        maxDistSpawn += gameLevel * 0.75f;
-        minDistBetweenEnemies = 2f;
+        if (gameLevel % 5 == 0) {
+            enemiesThisLevel = 10;
+            minDistBetweenEnemies = 3f;
+            maxDistSpawn = 6f;
+        }
+
+        enemiesThisLevel += Mathf.RoundToInt(gameLevel * 1.5f);
+        maxDistSpawn += gameLevel * 0.25f;
+        minDistBetweenEnemies += 0.5f;
     }
 }

@@ -60,6 +60,9 @@ public class Enemy : Movable
         GameManager.instance.enemyList.Remove(gameObject);
         GameManager.instance.SpawnBlood(transform.position);
         GameManager.instance.scoreManager.NewKill(transform.position + Vector3.up);
+
+        AudioManager.instance.Play("hit");
+
         Destroy(gameObject);
     }
 }
