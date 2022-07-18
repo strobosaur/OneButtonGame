@@ -52,12 +52,12 @@ public class ScoreManager : MonoBehaviour
         Color col = Color.HSVToRGB(hue, 0.25f, 1);
 
         GameManager.instance.score += killTotal;
-        GameManager.instance.ShowText(killTotal.ToString(), pos, col);
+        GameManager.instance.ShowText("+" + killTotal.ToString() + " pts", pos, col);
 
         if (Time.time - lastKill < lastKillDuration)
         {
             killStreak++;
-            scoreMultiplier = Mathf.Min(1000f,((scoreMultiplier * 1.25f) + (0.15f * killStreak)));
+            scoreMultiplier = Mathf.Min(1000f,((scoreMultiplier * 1.25f) + (0.25f * killStreak)));
         }
 
         lastKill = Time.time;
