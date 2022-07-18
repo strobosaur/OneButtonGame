@@ -284,7 +284,6 @@ public class GameManager : MonoBehaviour
     // FIND DISTANCE TO NEAREST ENEMY FROM GIVEN POINT
     public float DistanceNearestEnemy(Vector2 origin)
     {
-        //Transform t = player.GetComponent<Transform>();
         float distance = Mathf.Infinity;
         float tempDist;
         
@@ -379,14 +378,13 @@ public class GameManager : MonoBehaviour
         maxDistSpawn += gameLevel * 0.25f;
         minDistBetweenEnemies += 0.5f + (gameLevel / 5);
 
-        timeMustKill = 2.5f + Mathf.Max(0f, ((timeMustKill - 2.5f) * 0.8f));
+        timeMustKill = 3f + Mathf.Max(0f, ((timeMustKill - 3f) * 0.9f));
     }
 
     // HANDLE NEW KILL 
     public void NewKill(Vector3 position)
     {
         // SHOW DAMAGE MESSAGE
-        ShowText("+1 KILL!", position, Color.white, 2, 15, 16);
         SpawnBlood(position);
 
         scoreManager.NewKill(position + Vector3.up);
