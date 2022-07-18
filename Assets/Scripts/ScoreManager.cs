@@ -35,7 +35,7 @@ public class ScoreManager : MonoBehaviour
 
     public void NewKill(Vector3 pos)
     {
-        float killScore = baseScore * (GameManager.instance.gameLevel * 2.5f);
+        float killScore = baseScore * (GameManager.instance.gameLevel * 1.5f);
         float spdMtp;
         int killTotal;
 
@@ -57,7 +57,7 @@ public class ScoreManager : MonoBehaviour
         if (Time.time - lastKill < lastKillDuration)
         {
             killStreak++;
-            scoreMultiplier = Mathf.Min(1000f,((scoreMultiplier * 1.5f) + (0.25f * killStreak)));
+            scoreMultiplier = Mathf.Min(1000f,((scoreMultiplier * 1.25f) + (0.15f * killStreak)));
         }
 
         lastKill = Time.time;

@@ -202,11 +202,16 @@ public class GameManager : MonoBehaviour
     // RESET LEVEL PARAMETERS
     public void ResetLevel()
     {
+        // GAME MANAGER PARAMETERS
         gameCenterPoint = Vector2.up * 10f;
         playerMaxDist = 50f;
         levelWon = false;
         gameOver = false;
         gameStart = false;
+
+        // SCORE MANAGER PARAMETERS
+        scoreManager.killStreak = 0;
+        scoreManager.scoreMultiplier = 1.0f;
     }
 
     // SHOW FLOATING TEXT AT POSITION
@@ -228,7 +233,7 @@ public class GameManager : MonoBehaviour
             while 
             ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) 
             || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy)
-            || (spawnPoint.y < (playerLowestY / 2)));
+            || (spawnPoint.y > (playerLowestY / 2)));
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);
