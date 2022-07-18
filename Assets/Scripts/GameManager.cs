@@ -117,6 +117,8 @@ public class GameManager : MonoBehaviour
             gameStart = true;
 
             hud.ToggleHUD();
+            GameObject.Find("Platform").GetComponent<Animator>().SetBool("disabled", true);
+            GameObject.Find("Instructions").GetComponent<Animator>().SetBool("disabled", true);
         } else {
             hud.ToggleHUD(false);
         }
@@ -355,7 +357,7 @@ public class GameManager : MonoBehaviour
         maxDistSpawn += gameLevel * 0.25f;
         minDistBetweenEnemies += 0.5f + (gameLevel / 5);
 
-        timeMustKill = 2.5f + Mathf.Max(0f, ((timeMustKill - 2.5f) * 0.9f));
+        timeMustKill = 2.5f + Mathf.Max(0f, ((timeMustKill - 2.5f) * 0.8f));
     }
 
     public void NewKill(Vector3 position)
