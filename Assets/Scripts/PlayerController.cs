@@ -113,12 +113,6 @@ public class PlayerController : Movable
         }
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        //UpdateMotor(new Vector2(moveInput.x,0));
-    }
-
     // RESET PLAYER
     private void ResetPlayer()
     {

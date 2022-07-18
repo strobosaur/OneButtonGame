@@ -17,9 +17,9 @@ public class AttackHitbox : Collidable
         boxCollider.enabled = false;
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
-        base.Update();
+        base.FixedUpdate();
         if (endAttack) {
             if (Time.time - lastAttack > attackDuration) {
                 boxCollider.enabled = false;

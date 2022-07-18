@@ -62,6 +62,6 @@ public class ScoreManager : MonoBehaviour
 
         lastKill = Time.time;
 
-        GameManager.instance.hud.UpdateHudText();
+        //GameManager.instance.hud.UpdateHudText();
     }
 }

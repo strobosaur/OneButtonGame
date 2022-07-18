@@ -14,7 +14,7 @@ public class Collidable : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
     }
 
-    protected virtual void Update()
+    protected virtual void FixedUpdate()
     {
         // COLLISION CHECK
         boxCollider.OverlapCollider(filter, hits);
