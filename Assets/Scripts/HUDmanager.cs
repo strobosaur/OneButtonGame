@@ -105,6 +105,7 @@ public class HUDmanager : MonoBehaviour
         screenText.enabled = true;
         string hsString = "";
 
+        hsString += "HIGHSCORES\n\n";
         List<int> hsList = GameManager.instance.scoreManager.highscoreList;
         for (int i = 0; i < hsList.Count; i++)
         {

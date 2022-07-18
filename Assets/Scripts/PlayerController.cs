@@ -82,8 +82,7 @@ public class PlayerController : Movable
     }
 
     protected void Update()
-    {        
-        //moveInput = move.ReadValue<Vector2>();
+    {
         if (!GameManager.instance.levelWon && !GameManager.instance.gameOver)
         {        
             if (!isGrappling && !isAttacking) {
@@ -151,11 +150,15 @@ public class PlayerController : Movable
         if (Time.time - lastJump > jumpCooldown)
         {
             Debug.Log((dir * jumpForce).magnitude);
+
             rb.AddRelativeForce(dir * jumpForce, ForceMode2D.Impulse);
+
             jumpForce = 0f;
             lastJump = Time.time;
             isJumping = true;
             isColliding = false;
+
+            AudioManager.instance.Play("jump");
             jumpPS.Play();
         } else {
             jumpForce = 0f;
@@ -199,6 +202,8 @@ public class PlayerController : Movable
             grappleSystem.UpdateGrappleSystem(grapplingEnemy.transform.position);
 
             isGrappling = true;
+            
+            AudioManager.instance.Play("grapple");
         }
            
         if (isGrappling && btn.IsPressed()) {

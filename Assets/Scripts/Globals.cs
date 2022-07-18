@@ -36,4 +36,14 @@ public static class Globals
         else 
             return Mathf.Max((from - by), to);
     }
+
+    public static string Choose(string[] strings)
+    {
+        return strings[Random.Range(0, strings.Length)];
+    }
+
+    public static bool Chance(float chance)
+    {
+        return (Random.Range(0f,1f) < chance);
+    }
 }
