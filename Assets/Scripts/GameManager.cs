@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 
     public InputController playerControls;
     private InputAction btn;
+    private InputAction escape;
     public PlayerController player;
 
     public FloatingTextManager floatingTextManager;
@@ -78,12 +79,16 @@ public class GameManager : MonoBehaviour
     {
         btn = playerControls.Player.Button;
         btn.Enable();
+        
+        escape = playerControls.Player.Escape;
+        escape.Enable();
     }
 
     // ON DISABLE
     private void OnDisable()
     {
         btn.Disable();
+        escape.Disable();
     }
 
     // START
@@ -96,6 +101,13 @@ public class GameManager : MonoBehaviour
     // UPDATE
     void Update()
     {
+        // KILL GAME
+        if (escape.IsPressed()) {
+            Application.Quit();
+            return;
+        }
+
+        // RUN GAME
         if (gameStart)
         {
             if (!gameOver && !levelWon) {
@@ -233,7 +245,7 @@ public class GameManager : MonoBehaviour
             while 
             ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) 
             || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy)
-            || (spawnPoint.y > (playerLowestY / 2)));
+            || (spawnPoint.y < (playerLowestY / 2)));
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);

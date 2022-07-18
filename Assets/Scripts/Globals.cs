@@ -12,6 +12,8 @@ public static class Globals
     public static float G_INERTIA = 0.04f;
     public static float G_FRICTION = 0.16f;
 
+    public static int G_SCALE_TO_HD = 4;
+
     public static string G_PLAYERNAME = "Player";
 
     // GLOBAL FUNTIONS
