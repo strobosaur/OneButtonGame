@@ -7,6 +7,7 @@ public class BloodPS : MonoBehaviour
     public ParticleSystem ps;
     public float angle;
     public ParticleSystem.ShapeModule shapePS;
+    
     // Start is called before the first frame update
     void Start()
     {

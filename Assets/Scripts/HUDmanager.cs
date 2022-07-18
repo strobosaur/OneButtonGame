@@ -36,8 +36,6 @@ public class HUDmanager : MonoBehaviour
     private void Update()
     {
         // UPDATE HUD
-        //UpdateHudText();
-
         if (showHud) {
             BlackScreenFade();
         } else {
@@ -110,9 +108,9 @@ public class HUDmanager : MonoBehaviour
         screenText.enabled = true;
         string hsString = "";
 
-        hsString += "HIGHSCORES\n\n";
+        hsString += "HIGHSCORES\n";
         List<int> hsList = GameManager.instance.scoreManager.highscoreList;
-        for (int i = 0; i < hsList.Count; i++)
+        for (int i = 0; i < Mathf.Min(5, hsList.Count); i++)
         {
             hsString += (i+1).ToString() + " - " + hsList[i].ToString() + "\n";
         }

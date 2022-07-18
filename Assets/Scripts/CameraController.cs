@@ -20,6 +20,7 @@ public class CameraController : MonoBehaviour
 
     public bool isFollowing;
 
+    // AWAKE
     public void Awake()
     {
         isFollowing = true;
@@ -31,6 +32,7 @@ public class CameraController : MonoBehaviour
         lookAt = GameObject.Find(Globals.G_PLAYERNAME).transform;
     }
 
+    // UPDATE
     private void Update()
     {
         if (GameManager.instance.levelWon || GameManager.instance.gameOver) {
@@ -40,6 +42,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    // FIXED UPDATE
     private void FixedUpdate()
     {
         // CHECK DISTANCE TO TARGET OBJECT

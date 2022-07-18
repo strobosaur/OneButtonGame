@@ -54,46 +54,50 @@ public class GameManager : MonoBehaviour
     public float timeToKill;
     public float timeMustKill;
 
+    // AWAKE
     private void Awake()
     {
+        // CREATE SINGLETON
         if (GameManager.instance != null) {
             Destroy(gameObject);
             return;
         }
 
         instance = this;
-        playerControls = new InputController();
-
         DontDestroyOnLoad(gameObject);
+
+        // GET CONTROL CONNECTION
+        playerControls = new InputController();
         
+        // PREPARE SCENE LOAD
         SceneManager.sceneLoaded += LoadState;
     }
 
+    // ON ENABLE
     private void OnEnable()
     {
         btn = playerControls.Player.Button;
         btn.Enable();
     }
 
+    // ON DISABLE
     private void OnDisable()
     {
         btn.Disable();
     }
 
-    // Start is called before the first frame update
+    // START
     void Start()
     {
         List<GameObject> enemyList = new List<GameObject>();        
         hud.StartLevel("LEVEL " + gameLevel);
     }
 
-    // Update is called once per frame
+    // UPDATE
     void Update()
     {
         if (gameStart)
         {
-            //playerDist = DistanceNearestEnemy(player.transform.position);
-
             if (!gameOver && !levelWon) {
                 CheckWinCondition();
             } else if (levelWon) {
@@ -107,6 +111,7 @@ public class GameManager : MonoBehaviour
             }
 
             timeToKill = Mathf.Max(0f, (timeToKill - Time.deltaTime));
+
             // UPDATE HUD
             hud.UpdateHudText(timeToKill, score, scoreManager.scoreMultiplier, killsTotal);
         } else if (!gameStart && !gameOver && !levelWon && btn.WasPressedThisFrame()) {
@@ -360,6 +365,7 @@ public class GameManager : MonoBehaviour
         timeMustKill = 2.5f + Mathf.Max(0f, ((timeMustKill - 2.5f) * 0.8f));
     }
 
+    // HANDLE NEW KILL 
     public void NewKill(Vector3 position)
     {
         // SHOW DAMAGE MESSAGE
