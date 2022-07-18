@@ -12,6 +12,7 @@ public class HUDmanager : MonoBehaviour
     public TMP_Text killsText;
     public TMP_Text multiplierText;
     public TMP_Text scoreText;
+    public TMP_Text timerText;
 
     private float screenFadeStartTime;
     private float screenFadeDuration = 2f;
@@ -35,7 +36,7 @@ public class HUDmanager : MonoBehaviour
     private void Update()
     {
         // UPDATE HUD
-        UpdateHudText();
+        //UpdateHudText();
 
         if (showHud) {
             BlackScreenFade();
@@ -91,11 +92,15 @@ public class HUDmanager : MonoBehaviour
         screenText.text = msg;
     }
 
-    public void UpdateHudText()
+    public void UpdateHudText(float timeLeft, float score, float multiplier, float kills)
     {
         scoreText.text = GameManager.instance.score.ToString();
         multiplierText.text = GameManager.instance.scoreManager.scoreMultiplier.ToString();
         killsText.text = GameManager.instance.killsTotal.ToString();
+
+        System.TimeSpan result = System.TimeSpan.FromSeconds(timeLeft);
+        System.DateTime actualResult = System.DateTime.MinValue.Add(result);
+        timerText.text = actualResult.ToString("ss:ff");
     }
 
     public void DisplayHighscores()
@@ -113,5 +118,14 @@ public class HUDmanager : MonoBehaviour
         }
 
         screenText.text = hsString;
+    }
+
+    public void ToggleHUD(bool on = true)
+    {
+        if (on) {
+            GameObject.Find("HUDtext").GetComponent<CanvasGroup>().alpha = 1;
+        } else {            
+            GameObject.Find("HUDtext").GetComponent<CanvasGroup>().alpha = 0;
+        }
     }
 }

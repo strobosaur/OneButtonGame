@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public float playerDist;
     public float playerMaxDist;
+    private float playerLowestY = -20f;
     public bool gameOver;
     private float levelOverFade = 2f;
     private float levelOverTime;
@@ -47,6 +48,11 @@ public class GameManager : MonoBehaviour
 
     public int score;
     public int killsTotal;
+
+    // DEATH CONDITIONS
+    public float timeLastKill;
+    public float timeToKill;
+    public float timeMustKill;
 
     private void Awake()
     {
@@ -86,8 +92,7 @@ public class GameManager : MonoBehaviour
     {
         if (gameStart)
         {
-            //playerDist = Vector2.Distance(player.transform.position, gameCenterPoint);
-            playerDist = DistanceNearestEnemy(player.transform.position);
+            //playerDist = DistanceNearestEnemy(player.transform.position);
 
             if (!gameOver && !levelWon) {
                 CheckWinCondition();
@@ -99,10 +104,21 @@ public class GameManager : MonoBehaviour
                 CheckPlayerDeath();
             } else if (gameOver) {
                 HandleGameOver();
-            } 
-        } else if (!gameStart && btn.WasPressedThisFrame()) {
+            }
+
+            timeToKill = Mathf.Max(0f, (timeToKill - Time.deltaTime));
+            // UPDATE HUD
+            hud.UpdateHudText(timeToKill, score, scoreManager.scoreMultiplier, killsTotal);
+        } else if (!gameStart && !gameOver && !levelWon && btn.WasPressedThisFrame()) {
+            timeLastKill = Time.time;
+            timeToKill = ((timeLastKill + timeMustKill) - Time.time);
+
             gameOver = false;
             gameStart = true;
+
+            hud.ToggleHUD();
+        } else {
+            hud.ToggleHUD(false);
         }
     }
 
@@ -121,6 +137,7 @@ public class GameManager : MonoBehaviour
         hud.killsText = GameObject.Find("fieldKills").GetComponent<TMP_Text>();
         hud.multiplierText = GameObject.Find("fieldMultiplier").GetComponent<TMP_Text>();
         hud.scoreText = GameObject.Find("fieldScore").GetComponent<TMP_Text>();
+        hud.timerText = GameObject.Find("fieldTimer").GetComponent<TMP_Text>();
 
         // CHECK FOR SAVE STATE
         if (!PlayerPrefs.HasKey("SaveState"))
@@ -170,6 +187,8 @@ public class GameManager : MonoBehaviour
         score = 0;
         killsTotal = 0;
 
+        timeMustKill = 15f;
+
         ResetLevel();
     }
 
@@ -198,7 +217,11 @@ public class GameManager : MonoBehaviour
         {
             do {
                 spawnPoint = center + Random.insideUnitCircle * (maxDist + distOffset);
-            } while ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy));
+            } 
+            while 
+            ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) 
+            || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy)
+            || (spawnPoint.y < (playerLowestY / 2)));
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);
@@ -264,13 +287,14 @@ public class GameManager : MonoBehaviour
     // CHECK PLAYER DEATH CONDITIONS
     public void CheckPlayerDeath()
     {
-        if (playerDist > playerMaxDist) {
+        if ((timeToKill <= 0) || (player.transform.position.y < playerLowestY)){
             gameOver = true;
             levelOverTime = Time.time;
             scoreManager.highscoreList.Add(score);
             scoreManager.highscoreList.Sort();
             scoreManager.highscoreList.Reverse();
 
+            hud.ToggleHUD(false);
             hud.SetHud("GAME OVER");
         }
     }
@@ -312,6 +336,7 @@ public class GameManager : MonoBehaviour
             gameOver = false;
             levelOverTime = Time.time;
 
+            hud.ToggleHUD(false);
             hud.SetHud("LEVEL " + gameLevel.ToString() + " WIN");
         }
     }
@@ -328,6 +353,20 @@ public class GameManager : MonoBehaviour
 
         enemiesThisLevel += Mathf.RoundToInt(gameLevel * 1.5f);
         maxDistSpawn += gameLevel * 0.25f;
-        minDistBetweenEnemies += 0.5f;
+        minDistBetweenEnemies += 0.5f + (gameLevel / 5);
+
+        timeMustKill = 2.5f + Mathf.Max(0f, ((timeMustKill - 2.5f) * 0.9f));
+    }
+
+    public void NewKill(Vector3 position)
+    {
+        // SHOW DAMAGE MESSAGE
+        ShowText("+1 KILL!", position, Color.white, 2, 15, 16);
+        SpawnBlood(position);
+
+        scoreManager.NewKill(position + Vector3.up);
+
+        timeLastKill = Time.time;
+        timeToKill = ((timeLastKill + timeMustKill) - Time.time);
     }
 }

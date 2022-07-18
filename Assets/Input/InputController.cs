@@ -53,6 +53,15 @@ public partial class @InputController : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Spacebar"",
+                    ""type"": ""Button"",
+                    ""id"": ""084b9f32-4c3e-4c8b-8277-fd54fd2ad4fd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -231,6 +240,17 @@ public partial class @InputController : IInputActionCollection2, IDisposable
                     ""action"": ""Button"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b98780be-c4ed-4471-b0cf-9d906344f9f5"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Spacebar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -303,6 +323,7 @@ public partial class @InputController : IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Button = m_Player.FindAction("Button", throwIfNotFound: true);
+        m_Player_Spacebar = m_Player.FindAction("Spacebar", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -365,6 +386,7 @@ public partial class @InputController : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Button;
+    private readonly InputAction m_Player_Spacebar;
     public struct PlayerActions
     {
         private @InputController m_Wrapper;
@@ -372,6 +394,7 @@ public partial class @InputController : IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @Button => m_Wrapper.m_Player_Button;
+        public InputAction @Spacebar => m_Wrapper.m_Player_Spacebar;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -390,6 +413,9 @@ public partial class @InputController : IInputActionCollection2, IDisposable
                 @Button.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnButton;
                 @Button.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnButton;
                 @Button.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnButton;
+                @Spacebar.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSpacebar;
+                @Spacebar.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSpacebar;
+                @Spacebar.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSpacebar;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -403,6 +429,9 @@ public partial class @InputController : IInputActionCollection2, IDisposable
                 @Button.started += instance.OnButton;
                 @Button.performed += instance.OnButton;
                 @Button.canceled += instance.OnButton;
+                @Spacebar.started += instance.OnSpacebar;
+                @Spacebar.performed += instance.OnSpacebar;
+                @Spacebar.canceled += instance.OnSpacebar;
             }
         }
     }
@@ -457,5 +486,6 @@ public partial class @InputController : IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnButton(InputAction.CallbackContext context);
+        void OnSpacebar(InputAction.CallbackContext context);
     }
 }

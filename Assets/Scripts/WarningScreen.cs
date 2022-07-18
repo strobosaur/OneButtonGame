@@ -13,6 +13,8 @@ public class WarningScreen : MonoBehaviour
 
     private float playerDist;
     private float playerMaxDist;
+    private float timeToKill;
+    private float timeMustKill;
 
     private Image screen;
     
@@ -27,12 +29,15 @@ public class WarningScreen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        playerDist = GameManager.instance.playerDist;
-        playerMaxDist = GameManager.instance.playerMaxDist;
+        //playerDist = GameManager.instance.playerDist;
+        //playerMaxDist = GameManager.instance.playerMaxDist;
 
-        if (!GameManager.instance.gameOver && !GameManager.instance.levelWon)
+        timeToKill = GameManager.instance.timeToKill;
+        timeMustKill = GameManager.instance.timeMustKill;
+
+        if (!GameManager.instance.gameOver && !GameManager.instance.levelWon && GameManager.instance.gameStart)
         {
-            if (playerDist > (playerMaxDist * 0.66f)) {
+            if (timeToKill < (timeMustKill * 0.5f)) {
                 screen.enabled = true;
                 UpdateScreen();
             } else {
@@ -50,7 +55,8 @@ public class WarningScreen : MonoBehaviour
         }
 
         flashFactor1 = Mathf.Max(0f, 1f - ((Time.time - flashTime) / flashDuration));
-        flashFactor2 = Mathf.Max(0f, (playerDist - (playerMaxDist * 0.66f)) / (playerMaxDist / 0.66f));
+        //flashFactor2 = Mathf.Max(0f, (playerDist - (playerMaxDist * 0.66f)) / (playerMaxDist / 0.66f));
+        flashFactor2 = Mathf.Max(0f, 1f - (timeToKill / (timeMustKill * 0.5f)));
 
         Color col = screen.color;
 

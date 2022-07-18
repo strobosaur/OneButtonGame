@@ -55,12 +55,8 @@ public class Enemy : Movable
     // ALL FIGHTERS CAN RECEIVE DAMAGE
     protected virtual void ReceiveDamage(DoDamage dmg)
     {
-        // SHOW DAMAGE MESSAGE
-        GameManager.instance.ShowText("+1 KILL!", transform.position, Color.white, 2, 15, 16);
         GameManager.instance.enemyList.Remove(gameObject);
-        GameManager.instance.SpawnBlood(transform.position);
-        GameManager.instance.scoreManager.NewKill(transform.position + Vector3.up);
-
+        GameManager.instance.NewKill(transform.position);
         AudioManager.instance.Play("hit");
 
         Destroy(gameObject);
