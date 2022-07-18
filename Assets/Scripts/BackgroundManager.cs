@@ -20,7 +20,6 @@ public class BackgroundManager : MonoBehaviour
     private void FixedUpdate()
     {
         UpdateParallax();
-        //UpdateMover();
         ParallaxLoop();
     }
 
@@ -31,6 +30,7 @@ public class BackgroundManager : MonoBehaviour
             Transform bg = bgList[i];
             Sprite sprite = bg.GetComponent<SpriteRenderer>().sprite;
             Texture2D texture = sprite.texture;
+            
             float textureSizeX = texture.width / sprite.pixelsPerUnit;
             float textureSizeY = texture.height / sprite.pixelsPerUnit;
             float offsetX = (camPos.position.x - bg.transform.position.x) % textureSizeX;
@@ -55,10 +55,4 @@ public class BackgroundManager : MonoBehaviour
             speed -= ((parallaxMin - parallaxMax) / bgList.Count);
         }
     }
-
-    private void UpdateMover()
-    {
-        alwaysMoving.transform.position += new Vector3(moverSpd.x,moverSpd.y,0);
-    }
-
 }

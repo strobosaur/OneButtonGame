@@ -29,9 +29,6 @@ public class WarningScreen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //playerDist = GameManager.instance.playerDist;
-        //playerMaxDist = GameManager.instance.playerMaxDist;
-
         timeToKill = GameManager.instance.timeToKill;
         timeMustKill = GameManager.instance.timeMustKill;
 
@@ -55,7 +52,6 @@ public class WarningScreen : MonoBehaviour
         }
 
         flashFactor1 = Mathf.Max(0f, 1f - ((Time.time - flashTime) / flashDuration));
-        //flashFactor2 = Mathf.Max(0f, (playerDist - (playerMaxDist * 0.66f)) / (playerMaxDist / 0.66f));
         flashFactor2 = Mathf.Max(0f, 1f - (timeToKill / (timeMustKill * 0.5f)));
 
         Color col = screen.color;

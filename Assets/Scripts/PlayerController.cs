@@ -43,6 +43,7 @@ public class PlayerController : Movable
     public ParticleSystem flashPS;
     public ParticleSystem jumpPS;
 
+    // AWAKE
     void Awake()
     {
         playerControls = new InputController();
@@ -53,6 +54,7 @@ public class PlayerController : Movable
         jumpPS.Stop();
     }
 
+    // ON ENABLE
     private void OnEnable()
     {
         move = playerControls.Player.Move;
@@ -65,6 +67,7 @@ public class PlayerController : Movable
         btn.Enable();
     }
 
+    // ON DISABLE
     private void OnDisable()
     {
         move.Disable();
@@ -72,7 +75,7 @@ public class PlayerController : Movable
         btn.Disable();
     }
 
-    // Start is called before the first frame update
+    // START
     protected override void Start()
     {
         base.Start();
@@ -81,6 +84,7 @@ public class PlayerController : Movable
         Physics.IgnoreLayerCollision(8,7, true);
     }
 
+    // UPDATE
     protected void Update()
     {
         if (!GameManager.instance.levelWon && !GameManager.instance.gameOver)
@@ -134,17 +138,17 @@ public class PlayerController : Movable
         grappleSystem.ResetRope();
     }
 
+    // PREPARE JUMP & ADD FORCE
     private void PrepareJump(float input)
     {
         jumpForce = Globals.Approach(jumpForce, maxJumpForce, input + (jumpForce * 0.1f));
     }
 
+    // PERFORM JUMP WITH BUILT FORCE
     private void PlayerJump(Vector2 dir)
     {
         if (Time.time - lastJump > jumpCooldown)
         {
-            Debug.Log((dir * jumpForce).magnitude);
-
             rb.AddRelativeForce(dir * jumpForce, ForceMode2D.Impulse);
 
             jumpForce = 0f;
@@ -159,6 +163,7 @@ public class PlayerController : Movable
         }
     }
 
+    // SET NEAREST ENEMY FROM PLAYER POSITION
     protected void SetNearestEnemy()
     {
         if (GameManager.instance.enemyList.Count > 0)
@@ -170,6 +175,7 @@ public class PlayerController : Movable
         }
     }
 
+    // CHECK IF NEAREST ENEMY IN RANGE
     protected void CheckNearestEnemy()
     {
         if ((nearestEnemyDist < maxGrapplingRange) && (nearestEnemyDist > minGrapplingRange))
@@ -180,6 +186,7 @@ public class PlayerController : Movable
         }
     }
 
+    // TRY TO GRAPPLE NEAREST ENEMY
     protected void GrappleNearestEnemy()
     {
         if (enemyInRange && btn.WasPerformedThisFrame())
@@ -203,12 +210,20 @@ public class PlayerController : Movable
         if (isGrappling && btn.IsPressed()) {
             PrepareJump(jumpBuildSpd);
         } else if (enemyInRange && btn.WasReleasedThisFrame()) {
+
+            if (grapplingEnemy == null) {
+                grappleSystem.ResetRope();
+                isGrappling = false;
+                return;
+            }
+
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
             Attack();
             PlayerJump(dir);
         }
     }
 
+    // INITIATE ATTACK
     protected void Attack()
     {
         isAttacking = true;
@@ -219,6 +234,7 @@ public class PlayerController : Movable
         isGrappling = false;
     }
 
+    // PERFORM ATTACK SEQUENCE
     protected void Attacking()
     {
         attackHitbox.Attack();
@@ -228,12 +244,14 @@ public class PlayerController : Movable
         rb.angularVelocity = 360 * cross;
     }
 
+    // ATTACK HIT ENEMY
     public void AttackHit(Vector2 dir)
     {
         rb.AddRelativeForce(dir * attackDamping, ForceMode2D.Impulse);
         StopAttack();
     }
 
+    // STOP ATTACK SEQUENCE
     private void StopAttack()
     {
         attackHitbox.Passive();

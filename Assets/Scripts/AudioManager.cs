@@ -28,7 +28,6 @@ public class AudioManager : MonoBehaviour
         // MAKE SINGLETON
         if (instance == null) {
             instance = this;
-            //DontDestroyOnLoad(gameObject);
         } else {
             Destroy(gameObject);
         }
