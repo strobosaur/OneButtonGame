@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public InputController playerControls;
     private InputAction btn;
     private InputAction escape;
+    private InputAction restart;
     public PlayerController player;
 
     public FloatingTextManager floatingTextManager;
@@ -82,6 +83,9 @@ public class GameManager : MonoBehaviour
         
         escape = playerControls.Player.Escape;
         escape.Enable();
+        
+        restart = playerControls.Player.Restart;
+        restart.Enable();
     }
 
     // ON DISABLE
@@ -89,6 +93,7 @@ public class GameManager : MonoBehaviour
     {
         btn.Disable();
         escape.Disable();
+        restart.Disable();
     }
 
     // START
@@ -104,6 +109,16 @@ public class GameManager : MonoBehaviour
         // KILL GAME
         if (escape.IsPressed()) {
             Application.Quit();
+            return;
+        }
+
+        // RESTART GAME
+        if (restart.IsPressed()) {
+            // DELETE ALL SAVE DATA
+            showHighscore = false;
+            PlayerPrefs.DeleteAll();
+            ResetLevel();
+            SceneManager.LoadScene("Level_01");
             return;
         }
 
@@ -176,6 +191,9 @@ public class GameManager : MonoBehaviour
         // RESET HUD
         hud.StartLevel("LEVEL " + gameLevel);
 
+        // RESET LEVEL PARAMETERS
+        ResetLevel();
+
         // SPAN NEW ENEMIES
         enemyList.Clear();
         SpawnEnemies(enemiesThisLevel, maxDistSpawn, gameCenterPoint, minDistBetweenEnemies);
@@ -199,8 +217,8 @@ public class GameManager : MonoBehaviour
 
         gameLevel = 1;
 
-        minDistBetweenEnemies = 2f;
         maxDistSpawn = 6f;
+        minDistBetweenEnemies = maxDistSpawn * 0.33f;
         enemiesThisLevel = 5;
 
         score = 0;
@@ -216,7 +234,6 @@ public class GameManager : MonoBehaviour
     {
         // GAME MANAGER PARAMETERS
         gameCenterPoint = Vector2.up * 10f;
-        playerMaxDist = 50f;
         levelWon = false;
         gameOver = false;
         gameStart = false;
@@ -236,25 +253,33 @@ public class GameManager : MonoBehaviour
     private void SpawnEnemies(int amount, float maxDist, Vector2 center, float minDistEnemy)
     {
         Vector3 spawnPoint;
+        int overload;
         float distOffset = 0;
         for (int i = 0; i < amount; i++)
         {
+            overload = 1000;
             do {
                 spawnPoint = center + Random.insideUnitCircle * (maxDist + distOffset);
-            } 
-            while 
+            
+                center.y += 0.5f;
+                distOffset += 0.5f;
+
+                overload--;
+                if (overload <= 0) break;
+            } while 
             ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) 
             || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy)
-            || (spawnPoint.y < (playerLowestY / 2)));
+            || (spawnPoint.y < (playerLowestY * 0.25f)));
+
+            if (overload <= 0) {
+                center = gameCenterPoint;
+                i--;
+                continue;
+            }
 
             var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             enemyList.Add(ob);
-            
-            center.y += 0.5f;
-            distOffset += 1.0f;
         }
-
-        gameCenterPoint = (center / 2);
     }
 
     // FIND NEAREST ENEMY AND DELIVER OBJECT & DISTANCE
@@ -370,13 +395,13 @@ public class GameManager : MonoBehaviour
         gameLevel++;
         if (gameLevel % 5 == 0) {
             enemiesThisLevel = 10;
-            minDistBetweenEnemies = 3f;
-            maxDistSpawn = 6f;
+            maxDistSpawn = 6f + (gameLevel * 0.25f);
+            minDistBetweenEnemies = maxDistSpawn * 0.33f;
         }
 
         enemiesThisLevel += Mathf.RoundToInt(gameLevel * 1.5f);
         maxDistSpawn += gameLevel * 0.25f;
-        minDistBetweenEnemies += 0.5f + (gameLevel / 5);
+        minDistBetweenEnemies = maxDistSpawn * 0.33f;
 
         timeMustKill = 3f + Mathf.Max(0f, ((timeMustKill - 3f) * 0.9f));
     }
