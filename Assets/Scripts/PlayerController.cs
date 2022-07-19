@@ -25,6 +25,7 @@ public class PlayerController : Movable
     private float lastAttack;
     private float attackDuration = 0.75f;
     private float attackDamping = 5f;
+    private float attackVelocityLimit = 27.5f;
     private Vector2 attackTarget;
     public GameObject attackingEnemy;
     public AttackHitbox attackHitbox;
@@ -111,6 +112,11 @@ public class PlayerController : Movable
             if ((Time.time - lastAttack > attackDuration)) {
                 flashPS.Stop();
                 StopAttack();
+            }
+
+            Debug.Log(rb.velocity.magnitude);
+            if (rb.velocity.magnitude > attackVelocityLimit){                
+                attackHitbox.Attack();
             }
         } else {
             ResetPlayer();
