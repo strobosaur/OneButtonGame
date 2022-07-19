@@ -88,6 +88,7 @@ public class PlayerController : Movable
     // UPDATE
     protected void Update()
     {
+        // ONLY ACTIVE IF GAME STARTED
         if (!GameManager.instance.levelWon && !GameManager.instance.gameOver)
         {        
             if (!isGrappling && !isAttacking) {
@@ -98,27 +99,32 @@ public class PlayerController : Movable
                 }
             }
             
+            // CHECK IF GRAPPLING
             if (!isGrappling) 
                 SetNearestEnemy();
 
+            // GET DISTANCE NEAREST ENEMY
             CheckNearestEnemy();
             if (enemyInRange)
                 GrappleNearestEnemy();
 
+            // CHECK FOR ATTACK STATE
             if (isAttacking){
                 Attacking();
             }
 
+            // CHECK FOR ATTACK TIMER END
             if ((Time.time - lastAttack > attackDuration)) {
                 flashPS.Stop();
                 StopAttack();
             }
 
-            Debug.Log(rb.velocity.magnitude);
+            // KEEP ATTACKING IF OVER CERTAIN VELOCITY
             if (rb.velocity.magnitude > attackVelocityLimit){                
                 attackHitbox.Attack();
             }
         } else {
+            // RESET PLAYER IF NOT ACTIVE
             ResetPlayer();
         }
     }

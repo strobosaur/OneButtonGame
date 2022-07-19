@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public float playerDist;
     public float playerMaxDist;
-    private float playerLowestY = -20f;
+    private float playerLowestY = -30f;
     public bool gameOver;
     private float levelOverFade = 2f;
     private float levelOverTime;
@@ -73,6 +73,9 @@ public class GameManager : MonoBehaviour
         
         // PREPARE SCENE LOAD
         SceneManager.sceneLoaded += LoadState;
+
+        // DISABLE MOUSE CURSOR
+        Cursor.visible = false;
     }
 
     // ON ENABLE
@@ -269,11 +272,10 @@ public class GameManager : MonoBehaviour
             } while 
             ((DistanceNearestEnemy(spawnPoint) < minDistEnemy) 
             || (Vector2.Distance(spawnPoint, player.transform.position) < minDistEnemy)
-            || (spawnPoint.y < (playerLowestY * 0.25f)));
+            || (spawnPoint.y < -2f));
 
             if (overload <= 0) {
                 center = gameCenterPoint;
-                i--;
                 continue;
             }
 
