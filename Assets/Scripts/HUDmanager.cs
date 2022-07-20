@@ -129,7 +129,7 @@ public class HUDmanager : MonoBehaviour
                 TMP_Text hs = highscoreArr[i].GetComponent<TMP_Text>();
                 hs.color = Color.HSVToRGB((0.25f + (hueMod * i)) % 1f, 0.25f, 1f);
 
-                hs.text = hsList[i].Item1.ToString("yyyy/MM/dd - hh:mm:ss") + " | " 
+                hs.text = hsList[i].Item1.ToString("yyyy/MM/dd - HH:mm:ss") + " | " 
                         + "Level " + hsList[i].Item3.ToString() + " | "
                         + hsList[i].Item4.ToString() + " Kills | "
                         + hsList[i].Item2.ToString() + " pts";
