@@ -112,20 +112,23 @@ public class HUDmanager : MonoBehaviour
             showHud = true;
             goScreen.enabled = true;
             screenText.enabled = false;
-            float hueMod = 1;
+            float hueMod = 1f;
 
             // ENABLE SCORE TEXT OBJECTS
             GameObject.Find("HighscoreText0").GetComponent<TMP_Text>().enabled = true;
             foreach (var t in highscoreArr) { t.GetComponent<TMP_Text>().enabled = true; }
 
             List<(System.DateTime, int, int, int)> hsList = GameManager.instance.scoreManager.highscoreList;
-            if (hsList.Count > 1) hueMod = 1f / ((hsList[Mathf.Min(4, (hsList.Count - 1))].Item2 - hsList[0].Item2) / (hsList.Count + 1));
+            if (hsList.Count > 1) {
+                float diff = hsList[0].Item2 - hsList[Mathf.Min(4, (hsList.Count - 1))].Item2;
+                hueMod = (diff / (hsList.Count + 1)) / diff;
+            }
 
             for (int i = 0; i < Mathf.Min(5, hsList.Count); i++)
             {
                 TMP_Text hs = highscoreArr[i].GetComponent<TMP_Text>();
-                hs.color = Color.HSVToRGB(hueMod * i, 0.25f, 1f);
-                
+                hs.color = Color.HSVToRGB((0.25f + (hueMod * i)) % 1f, 0.25f, 1f);
+
                 hs.text = hsList[i].Item1.ToString("yyyy/MM/dd - hh:mm:ss") + " | " 
                         + "Level " + hsList[i].Item3.ToString() + " | "
                         + hsList[i].Item4.ToString() + " Kills | "

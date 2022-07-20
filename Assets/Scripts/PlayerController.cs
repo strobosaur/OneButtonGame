@@ -7,6 +7,7 @@ public class PlayerController : Movable
 {
     public Rigidbody2D rb;
     public InputController playerControls;
+    private Animator anim;
     private InputAction move;
     private InputAction look;
     private InputAction btn;
@@ -49,6 +50,7 @@ public class PlayerController : Movable
     {
         playerControls = new InputController();
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         maxGrapplingRange = 5f;
         minGrapplingRange = 0.5f;
         flashPS.Stop();
@@ -91,6 +93,9 @@ public class PlayerController : Movable
         // ONLY ACTIVE IF GAME STARTED
         if (!GameManager.instance.levelWon && !GameManager.instance.gameOver)
         {    
+            // UPDATE ANIMATOR
+            anim.SetFloat("velY", rb.velocity.y);
+            
             // SET PLAYER SPRITE DIRECTION BASED ON X VELOCITY
             if (rb.velocity.x < 0){
                 transform.localScale = new Vector3(-1,1,1);
@@ -176,6 +181,7 @@ public class PlayerController : Movable
             isJumping = true;
             isColliding = false;
 
+            anim.SetTrigger("jump");
             AudioManager.instance.Play("jump");
             jumpPS.Play();
         } else {
