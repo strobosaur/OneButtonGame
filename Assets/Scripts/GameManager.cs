@@ -79,6 +79,12 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
     }
 
+    // ON APPLICATION QUIT
+    private void OnApplicationQuit()
+    {
+        SaveGame();
+    }
+
     // ON ENABLE
     private void OnEnable()
     {
@@ -105,6 +111,10 @@ public class GameManager : MonoBehaviour
     {
         List<GameObject> enemyList = new List<GameObject>();        
         hud.StartLevel("LEVEL " + gameLevel);
+
+        // LOAD SCORES
+        LoadGame();
+        //SaveManager.LoadGame();
     }
 
     // UPDATE
@@ -112,15 +122,16 @@ public class GameManager : MonoBehaviour
     {
         // KILL GAME
         if (escape.IsPressed()) {
+            //SaveManager.SaveGame(scoreManager.highscoreList);
             Application.Quit();
             return;
         }
 
         // RESTART GAME
         if (restart.IsPressed()) {
-            // DELETE ALL SAVE DATA
+            // DELETE ALL SAVE STATE DATA
             showHighscore = false;
-            PlayerPrefs.DeleteAll();
+            PlayerPrefs.DeleteKey("SaveState");
             ResetLevel();
             SceneManager.LoadScene("Level_01");
             return;
@@ -193,7 +204,7 @@ public class GameManager : MonoBehaviour
             killsTotal = int.Parse(saveData[2]);
 
             HandleNewLevel();
-            PlayerPrefs.DeleteAll();
+            PlayerPrefs.DeleteKey("SaveState");
         }
 
         // RESET HUD
@@ -218,10 +229,31 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetString("SaveState", s);
     }
 
+    // LOAD STATE SCENE MANAGEMENT
+    public void SaveGame()
+    {
+        string s = JsonUtility.ToJson(scoreManager.highscoreList);
+
+        PlayerPrefs.SetString("SaveGame", s);
+    }
+
+    public void LoadGame()
+    {
+        if (!PlayerPrefs.HasKey("SaveGame"))
+        {
+            return;
+        } else {
+            scoreManager.highscoreList = JsonUtility.FromJson<List<(System.DateTime, int, int, int)>>(PlayerPrefs.GetString("SaveGame"));
+        }
+    }
+
     // TOTAL RESET OF GAME MANAGERS PARAMETERS
     public void ResetGame()
     {
-        PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteKey("SaveState");
+
+        // LOAD GAME
+        //LoadGame();
 
         gameLevel = 1;
 
@@ -350,6 +382,8 @@ public class GameManager : MonoBehaviour
             scoreManager.highscoreList.Add((date,score,gameLevel,killsTotal));
             scoreManager.highscoreList = scoreManager.highscoreList.OrderByDescending(score => score.Item2).ToList();
 
+            SaveGame();
+
             hud.ToggleHUD(false);
             hud.SetHud("GAME OVER");
         }
@@ -362,11 +396,12 @@ public class GameManager : MonoBehaviour
         if ((!showHighscore) && (Time.time - levelOverTime > levelOverFade) && (btn.WasPressedThisFrame())){
             showHighscore = true;
             hud.DisplayHighscores();
+            SaveState();
         } else if ((showHighscore) && (Time.time - highscoreTime > highScoreFade) && (btn.WasPressedThisFrame())) {
             // DELETE ALL SAVE DATA
             hud.DisplayHighscores(false);
             showHighscore = false;
-            PlayerPrefs.DeleteAll();
+            PlayerPrefs.DeleteKey("SaveState");
             ResetLevel();
             SceneManager.LoadScene("Level_01");
         }
