@@ -54,13 +54,15 @@ public class CameraController : MonoBehaviour
             if (isFollowing)
             {
                 camTarget = lookAt.position * camDistance;
-                //camTarget = player.rb.velocity * camDistance;
+                //camTarget = lookAt.position + (new Vector3(player.rb.velocity.x, player.rb.velocity.y, 0) * 0.5f);
                 moveDelta = new Vector2(camTarget.x, camTarget.y);
+                targetDist = Vector2.Distance(transform.position, moveDelta);
                 dustPS.transform.position = camTarget;
             } else {
                 dustPS.transform.position = transform.position;
             }
 
+            //movePos = Vector2.Lerp(movePos, moveDelta, camSpd + (targetDist / 300f));
             movePos = Vector2.Lerp(movePos, moveDelta, camSpd + (targetDist / 75f));
             movePos.x = Mathf.FloorToInt(movePos.x * Globals.G_CELLSIZE) / Globals.G_CELLSIZE;
             movePos.y = Mathf.FloorToInt(movePos.y * Globals.G_CELLSIZE) / Globals.G_CELLSIZE;

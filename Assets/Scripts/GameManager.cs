@@ -82,6 +82,7 @@ public class GameManager : MonoBehaviour
     // ON APPLICATION QUIT
     private void OnApplicationQuit()
     {
+        PlayerPrefs.DeleteKey("SaveState");
         SaveGame();
     }
 
@@ -113,7 +114,7 @@ public class GameManager : MonoBehaviour
         hud.StartLevel("LEVEL " + gameLevel);
 
         // LOAD SCORES
-        LoadGame();
+        //LoadGame();
         //SaveManager.LoadGame();
     }
 
@@ -207,6 +208,9 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.DeleteKey("SaveState");
         }
 
+        // LOAD GAME
+        LoadGame();
+
         // RESET HUD
         hud.StartLevel("LEVEL " + gameLevel);
 
@@ -232,7 +236,16 @@ public class GameManager : MonoBehaviour
     // LOAD STATE SCENE MANAGEMENT
     public void SaveGame()
     {
-        string s = JsonUtility.ToJson(scoreManager.highscoreList);
+        //string s = JsonUtility.ToJson(scoreManager.highscoreList);
+        string s = "";
+        foreach (var item in scoreManager.highscoreList)
+        {
+            s += item.Item1.ToString("O") + ";";
+            s += item.Item2.ToString() + ";";
+            s += item.Item3.ToString() + ";";
+            s += item.Item4.ToString() + ";";
+            s += "|";
+        }
 
         PlayerPrefs.SetString("SaveGame", s);
     }
@@ -243,7 +256,27 @@ public class GameManager : MonoBehaviour
         {
             return;
         } else {
-            scoreManager.highscoreList = JsonUtility.FromJson<List<(System.DateTime, int, int, int)>>(PlayerPrefs.GetString("SaveGame"));
+            //scoreManager.highscoreList = JsonUtility.FromJson<List<(System.DateTime, int, int, int)>>(PlayerPrefs.GetString("SaveGame"));
+
+            scoreManager.highscoreList.Clear();
+
+            // SPLIT STRING ROWS
+            string[] rows = PlayerPrefs.GetString("SaveGame").Split("|", System.StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in rows)
+            {
+                // CREATE NEW ROW DATA
+                string[] row = item.Split(";", System.StringSplitOptions.RemoveEmptyEntries);
+                System.DateTime date = System.DateTime.ParseExact(row[0], "O", System.Globalization.CultureInfo.InvariantCulture);
+                int score = int.Parse(row[1]);
+                int lvl = int.Parse(row[2]);
+                int kills = int.Parse(row[3]);
+
+                // ADD TO LIST
+                scoreManager.highscoreList.Add((date,score,lvl,kills));
+            }
+
+            // ORDER LIST BY DESCENDING
+            scoreManager.highscoreList = scoreManager.highscoreList.OrderByDescending(score => score.Item2).ToList();
         }
     }
 
@@ -378,10 +411,12 @@ public class GameManager : MonoBehaviour
             gameOver = true;
             levelOverTime = Time.time;
 
+            // ADD HIGH SCORE ENTRY
             System.DateTime date = System.DateTime.Now;
             scoreManager.highscoreList.Add((date,score,gameLevel,killsTotal));
             scoreManager.highscoreList = scoreManager.highscoreList.OrderByDescending(score => score.Item2).ToList();
 
+            // SAVE GAME
             SaveGame();
 
             hud.ToggleHUD(false);
