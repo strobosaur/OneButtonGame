@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -170,7 +171,11 @@ public class GameManager : MonoBehaviour
         // FIND HUD OBJECT REFERENCES
         hud.goScreen = GameObject.Find("GameOverScreen").GetComponent<Image>();
         hud.screenText = GameObject.Find("BlackScreenText").GetComponent<TMP_Text>();
+        hud.highscoreText = GameObject.Find("HighscoreText0").GetComponent<TMP_Text>();
 
+        for (int i = 0; i < 5; i++) { hud.highscoreArr[i] = GameObject.Find("HighscoreText" + (i+1).ToString()); }
+
+        // FIND HUD OSD OBJECT REFERENCES
         hud.killsText = GameObject.Find("fieldKills").GetComponent<TMP_Text>();
         hud.multiplierText = GameObject.Find("fieldMultiplier").GetComponent<TMP_Text>();
         hud.scoreText = GameObject.Find("fieldScore").GetComponent<TMP_Text>();
@@ -340,9 +345,10 @@ public class GameManager : MonoBehaviour
         if ((timeToKill <= 0) || (player.transform.position.y < playerLowestY)){
             gameOver = true;
             levelOverTime = Time.time;
-            scoreManager.highscoreList.Add(score);
-            scoreManager.highscoreList.Sort();
-            scoreManager.highscoreList.Reverse();
+
+            System.DateTime date = System.DateTime.Now;
+            scoreManager.highscoreList.Add((date,score,gameLevel,killsTotal));
+            scoreManager.highscoreList = scoreManager.highscoreList.OrderByDescending(score => score.Item2).ToList();
 
             hud.ToggleHUD(false);
             hud.SetHud("GAME OVER");
@@ -358,6 +364,7 @@ public class GameManager : MonoBehaviour
             hud.DisplayHighscores();
         } else if ((showHighscore) && (Time.time - highscoreTime > highScoreFade) && (btn.WasPressedThisFrame())) {
             // DELETE ALL SAVE DATA
+            hud.DisplayHighscores(false);
             showHighscore = false;
             PlayerPrefs.DeleteAll();
             ResetLevel();

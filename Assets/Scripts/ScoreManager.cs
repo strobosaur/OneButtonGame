@@ -14,7 +14,7 @@ public class ScoreManager : MonoBehaviour
 
     public int scoreTotal;
 
-    public List<int> highscoreList = new List<int>();
+    public List<(System.DateTime, int, int, int)> highscoreList = new List<(System.DateTime, int, int, int)>();
 
     private void Awake()
     {
@@ -35,9 +35,10 @@ public class ScoreManager : MonoBehaviour
 
     public void NewKill(Vector3 pos)
     {
-        float killScore = baseScore * (GameManager.instance.gameLevel * 1.5f);
+        float killScore = baseScore * (Mathf.Max(1f, GameManager.instance.gameLevel * 1.5f));
         float spdMtp;
         int killTotal;
+        float hueMod = killScore * 500;
 
         GameManager.instance.killsTotal++;
 
@@ -48,7 +49,7 @@ public class ScoreManager : MonoBehaviour
 
         killTotal = Mathf.RoundToInt(killScore);
 
-        float hue = Mathf.Min(1, killTotal / 5000f);
+        float hue = Mathf.Min(1, killTotal / hueMod);
         Color col = Color.HSVToRGB(hue, 0.25f, 1);
 
         GameManager.instance.score += killTotal;

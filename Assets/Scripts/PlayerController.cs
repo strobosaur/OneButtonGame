@@ -90,7 +90,15 @@ public class PlayerController : Movable
     {
         // ONLY ACTIVE IF GAME STARTED
         if (!GameManager.instance.levelWon && !GameManager.instance.gameOver)
-        {        
+        {    
+            // SET PLAYER SPRITE DIRECTION BASED ON X VELOCITY
+            if (rb.velocity.x < 0){
+                transform.localScale = new Vector3(-1,1,1);
+            } else {
+                transform.localScale = new Vector3(1,1,1);
+            }
+
+            // CHECK FOR NORMAL JUMP
             if (!isGrappling && !isAttacking) {
                 if (btn.WasReleasedThisFrame()) {
                     PlayerJump(nearestEnemyDir);

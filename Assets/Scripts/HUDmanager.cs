@@ -8,11 +8,13 @@ public class HUDmanager : MonoBehaviour
 {
     public Image goScreen;
     public TMP_Text screenText;
+    public GameObject[] highscoreArr;
 
     public TMP_Text killsText;
     public TMP_Text multiplierText;
     public TMP_Text scoreText;
     public TMP_Text timerText;
+    public TMP_Text highscoreText;
 
     private float screenFadeStartTime;
     private float screenFadeDuration = 2f;
@@ -31,6 +33,8 @@ public class HUDmanager : MonoBehaviour
         showHud = false;
         goScreen.enabled = false;
         screenText.enabled = true;
+
+        DisplayHighscores(false);
     }
 
     private void Update()
@@ -101,21 +105,37 @@ public class HUDmanager : MonoBehaviour
         timerText.text = actualResult.ToString("ss:ff");
     }
 
-    public void DisplayHighscores()
+    public void DisplayHighscores(bool show = true)
     {
-        showHud = true;
-        goScreen.enabled = true;
-        screenText.enabled = true;
-        string hsString = "";
-
-        hsString += "HIGHSCORES\n";
-        List<int> hsList = GameManager.instance.scoreManager.highscoreList;
-        for (int i = 0; i < Mathf.Min(5, hsList.Count); i++)
+        if (show)
         {
-            hsString += (i+1).ToString() + " - " + hsList[i].ToString() + "\n";
-        }
+            showHud = true;
+            goScreen.enabled = true;
+            screenText.enabled = false;
+            float hueMod = 1;
 
-        screenText.text = hsString;
+            // ENABLE SCORE TEXT OBJECTS
+            GameObject.Find("HighscoreText0").GetComponent<TMP_Text>().enabled = true;
+            foreach (var t in highscoreArr) { t.GetComponent<TMP_Text>().enabled = true; }
+
+            List<(System.DateTime, int, int, int)> hsList = GameManager.instance.scoreManager.highscoreList;
+            if (hsList.Count > 1) hueMod = 1f / ((hsList[Mathf.Min(4, (hsList.Count - 1))].Item2 - hsList[0].Item2) / (hsList.Count + 1));
+
+            for (int i = 0; i < Mathf.Min(5, hsList.Count); i++)
+            {
+                TMP_Text hs = highscoreArr[i].GetComponent<TMP_Text>();
+                hs.color = Color.HSVToRGB(hueMod * i, 0.25f, 1f);
+                
+                hs.text = hsList[i].Item1.ToString("yyyy/MM/dd - hh:mm:ss") + " | " 
+                        + "Level " + hsList[i].Item3.ToString() + " | "
+                        + hsList[i].Item4.ToString() + " Kills | "
+                        + hsList[i].Item2.ToString() + " pts";
+            }
+        } else {
+            // DISABLE SCORE TEXT OBJECTS
+            GameObject.Find("HighscoreText0").GetComponent<TMP_Text>().enabled = false;
+            foreach (var t in highscoreArr) { t.GetComponent<TMP_Text>().enabled = false; }
+        }
     }
 
     public void ToggleHUD(bool on = true)
