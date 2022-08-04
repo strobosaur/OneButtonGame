@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using UnityEngine.Pool;
 
 public class GameManager : MonoBehaviour
 {
@@ -37,6 +38,10 @@ public class GameManager : MonoBehaviour
     public List<GameObject> enemyList;
     public GameObject enemyPrefab;
     public ParticleSystem bloodPS;
+    
+    // OBJECT POOLING
+    private ObjectPool<GameObject> enemyPool;
+    private ObjectPool<ParticleSystem> bloodPool;
 
     // LEVEL PARAMETERS
     public Vector2 gameCenterPoint;
@@ -84,7 +89,29 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded += LoadState;
 
         // DISABLE MOUSE CURSOR
-        Cursor.visible = false;
+        Cursor.visible = false;        
+
+        // CREATE ENEMY POOL
+        enemyPool = new ObjectPool<GameObject>(() => { 
+            return Instantiate(enemyPrefab);
+        }, enemyPF => {
+            enemyPF.gameObject.SetActive(true);
+        }, enemyPF => {
+            enemyPF.gameObject.SetActive(false);
+        }, enemyPF => {
+            Destroy(enemyPF.gameObject);
+        }, false, 100, 200);
+
+        // CREATE BLOOD POOL
+        bloodPool = new ObjectPool<ParticleSystem>(() => { 
+            return Instantiate(bloodPS);
+        }, bloodPF => {
+            bloodPF.gameObject.SetActive(true);
+        }, bloodPF => {
+            bloodPF.gameObject.SetActive(false);
+        }, bloodPF => {
+            Destroy(bloodPF.gameObject);
+        }, false, 50, 100);
     }
 
     // ON APPLICATION QUIT
@@ -336,6 +363,18 @@ public class GameManager : MonoBehaviour
         floatingTextManager.Show(msg, fontSize, color, position, new Vector3(0,motion,0), duration);
     }
 
+    // GET ENEMY FROM POOL
+    public GameObject GetEnemyPool()
+    {
+        return enemyPool.Get();
+    }
+
+    // GET BLOOD FROM POOL
+    public ParticleSystem GetBloodPool()
+    {
+        return bloodPool.Get();
+    }
+
     // SPAWN ENEMIES WITH PARAMETERS
     private void SpawnEnemies(int amount, float maxDist, Vector2 center, float minDistEnemy)
     {
@@ -363,7 +402,9 @@ public class GameManager : MonoBehaviour
                 continue;
             }
 
-            var ob = Instantiate(enemyPrefab, new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
+            var ob = GetEnemyPool();
+            //var ob = Instantiate(GetEnemyPool(), new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
+            ob.transform.position = spawnPoint;
             enemyList.Add(ob);
         }
     }
@@ -411,7 +452,9 @@ public class GameManager : MonoBehaviour
     // SPAWN BLOOD SPLASH PARTICLES
     public void SpawnBlood(Vector2 position, Vector2 angle = new Vector2())
     {
-        var ob = Instantiate(bloodPS, position, Quaternion.identity);
+        var ob = bloodPool.Get();
+        //var ob = Instantiate(bloodPS, position, Quaternion.identity);
+        ob.transform.position = position;
         if (angle.magnitude > 0) {
             var bs = ob.GetComponent<BloodPS>();
             bs.SetAngle(angle);
