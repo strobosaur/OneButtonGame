@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : Movable
 {
+    // MOVEMENT PARAMETERS
     public Rigidbody2D rb;
     public InputController playerControls;
     private Animator anim;
@@ -12,6 +13,7 @@ public class PlayerController : Movable
     private InputAction look;
     private InputAction btn;
 
+    // GRAPPLE PARAMETERS
     private LineRenderer lineRenderer;
     public GameObject nearestEnemy;
     private Vector2 nearestEnemyDir;
@@ -22,6 +24,7 @@ public class PlayerController : Movable
     protected float minGrapplingRange;
     public GrappleSystem grappleSystem;
 
+    // ATTACK PARAMETERS
     public bool isAttacking;
     private float lastAttack;
     private float attackDuration = 0.75f;
@@ -33,6 +36,7 @@ public class PlayerController : Movable
 
     public float p1Spd = 5.0f;
 
+    // JUMP PARAMETERS
     private float jumpForce;
     private float jumpBuildSpd = 0.1f;
     private float maxJumpForce = 30.0f;
@@ -42,6 +46,7 @@ public class PlayerController : Movable
     public bool isGrappling = false;
     protected float distToGround;
 
+    // PARTICLE SYSTEMS
     public ParticleSystem flashPS;
     public ParticleSystem jumpPS;
 
@@ -51,6 +56,7 @@ public class PlayerController : Movable
         playerControls = new InputController();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        
         maxGrapplingRange = 5f;
         minGrapplingRange = 0.5f;
         flashPS.Stop();
@@ -95,7 +101,7 @@ public class PlayerController : Movable
         {    
             // UPDATE ANIMATOR
             anim.SetFloat("velY", rb.velocity.y);
-            
+
             // SET PLAYER SPRITE DIRECTION BASED ON X VELOCITY
             if (rb.velocity.x < 0){
                 transform.localScale = new Vector3(-1,1,1);
@@ -142,6 +148,12 @@ public class PlayerController : Movable
         }
     }
 
+    // FIXED UPDATE
+    private void FixedUpdate()
+    {
+        if (rb.velocity.y < ((-attackVelocityLimit) * 1.1f)) rb.velocity.Set(rb.velocity.x, (-attackVelocityLimit) * 1.1f);
+    }
+
     // RESET PLAYER
     private void ResetPlayer()
     {
@@ -166,7 +178,7 @@ public class PlayerController : Movable
     // PREPARE JUMP & ADD FORCE
     private void PrepareJump(float input)
     {
-        jumpForce = Globals.Approach(jumpForce, maxJumpForce, input + (jumpForce * 0.1f));
+        jumpForce = Globals.Approach(jumpForce, maxJumpForce, (input * 500f + (jumpForce * 0.1f)) * Time.deltaTime);
     }
 
     // PERFORM JUMP WITH BUILT FORCE
@@ -174,7 +186,7 @@ public class PlayerController : Movable
     {
         if (Time.time - lastJump > jumpCooldown)
         {
-            rb.AddRelativeForce(dir * jumpForce, ForceMode2D.Impulse);
+            rb.AddForce(dir * jumpForce, ForceMode2D.Impulse);
 
             jumpForce = 0f;
             lastJump = Time.time;
@@ -246,6 +258,7 @@ public class PlayerController : Movable
             Vector2 dir = (grapplingEnemy.transform.position - transform.position).normalized;
             Attack();
             PlayerJump(dir);
+            grappleSystem.ResetRope();
         }
     }
 

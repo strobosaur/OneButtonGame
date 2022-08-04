@@ -9,30 +9,43 @@ using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
+    // SINGLETON
     public static GameManager instance;
 
+    // CAMERA
     public CameraController cam;
 
+    // INPUT ACTIONS
     public InputController playerControls;
     private InputAction btn;
     private InputAction escape;
     private InputAction restart;
     public PlayerController player;
 
+    // HUD & SCORE
     public FloatingTextManager floatingTextManager;
     public HUDmanager hud;
     public ScoreManager scoreManager;
 
+    private bool showHighscore = false;
+    [HideInInspector]
+    public float highscoreTime;
+    [HideInInspector]
+    public float highScoreFade = 2f;
+
+    // ENEMIES
     public List<GameObject> enemyList;
     public GameObject enemyPrefab;
     public ParticleSystem bloodPS;
 
+    // LEVEL PARAMETERS
     public Vector2 gameCenterPoint;
     private float minDistBetweenEnemies;
     private float maxDistSpawn;
     public int enemiesThisLevel;
     public int gameLevel;
 
+    // PLAYER & GAME RULES
     [HideInInspector]
     public float playerDist;
     public float playerMaxDist;
@@ -43,12 +56,7 @@ public class GameManager : MonoBehaviour
     public bool levelWon;
     public bool gameStart;
 
-    private bool showHighscore = false;
-    [HideInInspector]
-    public float highscoreTime;
-    [HideInInspector]
-    public float highScoreFade = 2f;
-
+    // SCORE & KILLS
     public int score;
     public int killsTotal;
 
@@ -138,15 +146,17 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // RUN GAME
+        // GAME IS RUNNING
         if (gameStart)
         {
+            // CHECK WIN CONDITIONS
             if (!gameOver && !levelWon) {
                 CheckWinCondition();
             } else if (levelWon) {
                 HandleLevelWin();
             }
 
+            // CHECK GAME OVER CONDITIONS
             if (!gameOver && !levelWon) {
                 CheckPlayerDeath();
             } else if (gameOver) {
@@ -157,7 +167,10 @@ public class GameManager : MonoBehaviour
 
             // UPDATE HUD
             hud.UpdateHudText(timeToKill, score, scoreManager.scoreMultiplier, killsTotal);
+
         } else if (!gameStart && !gameOver && !levelWon && btn.WasPressedThisFrame()) {
+
+            // START GAME
             timeLastKill = Time.time;
             timeToKill = ((timeLastKill + timeMustKill) - Time.time);
 
@@ -250,6 +263,7 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetString("SaveGame", s);
     }
 
+    // LOAD GAME
     public void LoadGame()
     {
         if (!PlayerPrefs.HasKey("SaveGame"))
