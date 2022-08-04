@@ -97,7 +97,9 @@ public class HUDmanager : MonoBehaviour
     public void UpdateHudText(float timeLeft, float score, float multiplier, float kills)
     {
         scoreText.text = GameManager.instance.score.ToString();
-        multiplierText.text = GameManager.instance.scoreManager.scoreMultiplier.ToString();
+        float tempMultiplier = ((float)Mathf.RoundToInt(GameManager.instance.scoreManager.scoreMultiplier * 4f)) / 4f;
+        //multiplierText.text = GameManager.instance.scoreManager.scoreMultiplier.ToString();
+        multiplierText.text = tempMultiplier.ToString();
         killsText.text = GameManager.instance.killsTotal.ToString();
 
         System.TimeSpan result = System.TimeSpan.FromSeconds(timeLeft);
