@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "InputController",
     "maps": [
         {
@@ -27,7 +28,7 @@
                     "name": "Button",
                     "type": "Button",
                     "id": "0ae9b8b5-aa10-407a-a2d0-dc91f6faeaac",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -36,7 +37,7 @@
                     "name": "Escape",
                     "type": "Button",
                     "id": "b47b2a4c-ba80-4edf-ad58-0436bc5be6a3",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -45,7 +46,7 @@
                     "name": "Restart",
                     "type": "Button",
                     "id": "4a514c54-d69b-4885-ac6e-c2602439ef61",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -307,6 +308,50 @@
                 },
                 {
                     "name": "",
+                    "id": "2b4d03a5-ea67-4d16-893e-521fbc65c0e4",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b3e50b54-b268-4cd1-914f-1f4b15541f8a",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2804a4bc-6e63-4523-a862-b44ba261582b",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c4f70e7a-fae8-4fd8-b15f-9506c36ffb16",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "7ba07cb8-207b-4a5f-82c1-1b7a175018be",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
@@ -329,33 +374,22 @@
                 },
                 {
                     "name": "",
-                    "id": "db97f801-6c9b-414f-913c-a999529a527c",
-                    "path": "<Gamepad>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Restart",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "a9306f69-de56-4de2-98e9-7fd36197fe79",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Restart",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "0fe47df7-f6ca-434b-b7a4-2e5bebe3a8be",
                     "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
+                    "action": "Restart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "85f57e72-d3d5-4673-b7e6-a2072bfeafb8",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
                     "action": "Restart",
                     "isComposite": false,
                     "isPartOfComposite": false

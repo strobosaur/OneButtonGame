@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Movable : MonoBehaviour
 {
-    protected BoxCollider2D boxCollider;
+    protected CircleCollider2D collider;
     protected RaycastHit2D hit;
 
     protected Vector2 moveInput;
@@ -24,7 +24,7 @@ public abstract class Movable : MonoBehaviour
     // START
     protected virtual void Start()
     {
-        boxCollider = GetComponent<BoxCollider2D>();
+        collider = GetComponent<CircleCollider2D>();
     }
 
     // MOVEMENT
@@ -47,32 +47,18 @@ public abstract class Movable : MonoBehaviour
         // REDUCE PUSH FORCE
         pushDirection = Vector2.Lerp(pushDirection, Vector2.zero, pushRecoverySpeed);
 
-        // COLLISION CHECK?
+        // COLLISION CHECK
         if (collidable)
         {    
-            // COLLISION CHECK Y
-            hit = Physics2D.BoxCast(transform.position + new Vector3(boxCollider.offset.x,boxCollider.offset.y,input.z), boxCollider.size, 0, new Vector2(0,moveDelta.y), Mathf.Abs(moveDelta.y * Time.deltaTime), LayerMask.GetMask("Actor", "Blocking"));
-            if (hit.collider == null)
-            {
-                // MAKE ACTOR MOVE
-                transform.Translate(0, moveDelta.y * Time.deltaTime, 0);
-            } else {
-                movePos.y = 0;
-                isColliding = true;
-            }
-
-            // COLLISION CHECK X
-            hit = Physics2D.BoxCast(transform.position + new Vector3(boxCollider.offset.x,boxCollider.offset.y,input.z), boxCollider.size, 0, new Vector2(moveDelta.x,0), Mathf.Abs(moveDelta.x * Time.deltaTime), LayerMask.GetMask("Actor", "Blocking"));
-            if (hit.collider == null)
-            {
-                // MAKE ACTOR MOVE
-                transform.Translate(moveDelta.x * Time.deltaTime, 0, 0);
-            } else {
-                movePos.x = 0;
-                isColliding = true;
-            }
-        } else {
-            transform.Translate(moveDelta * Time.deltaTime);
+            hit = Physics2D.CircleCast(
+                transform.position, 
+                collider.radius, 
+                moveDelta, 
+                LayerMask.GetMask("Actor", "Blocking"));
+            isColliding = hit.collider != null;
         }
+
+        // MOVE
+        transform.Translate(moveDelta * Time.deltaTime);
     }
 }

@@ -14,7 +14,7 @@ public class AttackHitbox : Collidable
     protected override void Start()
     {
         base.Start();
-        boxCollider.enabled = false;
+        collider.enabled = false;
     }
 
     protected override void FixedUpdate()
@@ -22,11 +22,11 @@ public class AttackHitbox : Collidable
         base.FixedUpdate();
         if (endAttack) {
             if (Time.time - lastAttack > attackDuration) {
-                boxCollider.enabled = false;
+                collider.enabled = false;
             }
         }
 
-        if (boxCollider.enabled) {
+        if (collider.enabled) {
             attackPS1.emitting = true;
         } else {
             attackPS1.emitting = false;
@@ -35,7 +35,8 @@ public class AttackHitbox : Collidable
 
     public void Attack()
     {
-        boxCollider.enabled = true;
+        //boxCollider.enabled = true;
+        collider.enabled = true;
         endAttack = false;
     }
 
@@ -54,7 +55,7 @@ public class AttackHitbox : Collidable
             DoDamage dmg = new DoDamage(){
                 damageAmount = 1,
                 origin = player.transform.position,
-                impactForce = player.rb.velocity.magnitude
+                impactForce = player.rb.linearVelocity.magnitude
             };
 
             collided.SendMessage("ReceiveDamage", dmg);
