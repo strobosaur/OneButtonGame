@@ -158,7 +158,6 @@ public class GameManager : MonoBehaviour
     {
         // KILL GAME
         if (escape.IsPressed()) {
-            //SaveManager.SaveGame(scoreManager.highscoreList);
             Application.Quit();
             return;
         }
@@ -276,7 +275,6 @@ public class GameManager : MonoBehaviour
     // LOAD STATE SCENE MANAGEMENT
     public void SaveGame()
     {
-        //string s = JsonUtility.ToJson(scoreManager.highscoreList);
         string s = "";
         foreach (var item in scoreManager.highscoreList)
         {
@@ -297,8 +295,7 @@ public class GameManager : MonoBehaviour
         {
             return;
         } else {
-            //scoreManager.highscoreList = JsonUtility.FromJson<List<(System.DateTime, int, int, int)>>(PlayerPrefs.GetString("SaveGame"));
-
+            // CLEAR LIST
             scoreManager.highscoreList.Clear();
 
             // SPLIT STRING ROWS
@@ -403,7 +400,6 @@ public class GameManager : MonoBehaviour
             }
 
             var ob = GetEnemyPool();
-            //var ob = Instantiate(GetEnemyPool(), new Vector3(spawnPoint.x, spawnPoint.y, 0), Quaternion.identity);
             ob.transform.position = spawnPoint;
             enemyList.Add(ob);
         }
@@ -453,7 +449,6 @@ public class GameManager : MonoBehaviour
     public void SpawnBlood(Vector2 position, Vector2 angle = new Vector2())
     {
         var ob = bloodPool.Get();
-        //var ob = Instantiate(bloodPS, position, Quaternion.identity);
         ob.transform.position = position;
         if (angle.magnitude > 0) {
             var bs = ob.GetComponent<BloodPS>();

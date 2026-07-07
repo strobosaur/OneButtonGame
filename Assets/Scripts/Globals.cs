@@ -16,6 +16,13 @@ public static class Globals
 
     public static string G_PLAYERNAME = "Player";
 
+    public static float G_JUMPBUILDSPD = 450f;
+
+    public static float G_MAX_JUMP_FORCE = 40.0f;
+
+    public static int G_BASE_SCORE = 1;
+    public static int G_BASE_HUE_SHIFT = 500; 
+
     // GLOBAL FUNTIONS
 
     // EASE IN OUT SINE

@@ -10,8 +10,6 @@ public class ScoreManager : MonoBehaviour
     public float scoreMultiplier = 1.0f;
     public int killStreak = 0;
 
-    public int baseScore = 10;
-
     public int scoreTotal;
 
     public List<(System.DateTime, int, int, int)> highscoreList = new List<(System.DateTime, int, int, int)>();
@@ -35,10 +33,10 @@ public class ScoreManager : MonoBehaviour
 
     public void NewKill(Vector3 pos)
     {
-        float killScore = baseScore * (Mathf.Max(1f, GameManager.instance.gameLevel * 1.5f));
+        float killScore = Globals.G_BASE_SCORE * (Mathf.Max(1f, GameManager.instance.gameLevel * 1.5f));
         float spdMtp;
         int killTotal;
-        float hueMod = killScore * 500;
+        float hueMod = killScore * Globals.G_BASE_HUE_SHIFT;
 
         GameManager.instance.killsTotal++;
 

@@ -39,16 +39,21 @@ public class PlayerController : Movable
     // JUMP PARAMETERS
     private float jumpForce;
     private float jumpBuildSpd = 0.1f;
-    private float maxJumpForce = 30.0f;
     private float lastJump;
     private float jumpCooldown = 0.5f;
     public bool isJumping = false;
     public bool isGrappling = false;
     protected float distToGround;
 
+    public float getJumpForce() { return jumpForce; }
+
     // PARTICLE SYSTEMS
     public ParticleSystem flashPS;
     public ParticleSystem jumpPS;
+
+    public GameObject jFlash;
+    private JumpFlash jumpFlash;
+    private SpriteRenderer jfSr;
 
     // AWAKE
     void Awake()
@@ -56,7 +61,12 @@ public class PlayerController : Movable
         playerControls = new InputController();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        
+
+        jFlash = GameObject.Find("JumpFlash");
+        jumpFlash = jFlash.GetComponent<JumpFlash>();
+        jfSr = jFlash.GetComponent<SpriteRenderer>();
+        jfSr.enabled = false;
+
         maxGrapplingRange = 5f;
         minGrapplingRange = 0.5f;
         flashPS.Stop();
@@ -100,10 +110,10 @@ public class PlayerController : Movable
         if (!GameManager.instance.levelWon && !GameManager.instance.gameOver)
         {    
             // UPDATE ANIMATOR
-            anim.SetFloat("velY", rb.velocity.y);
+            anim.SetFloat("velY", rb.linearVelocity.y);
 
             // SET PLAYER SPRITE DIRECTION BASED ON X VELOCITY
-            if (rb.velocity.x < 0){
+            if (rb.linearVelocity.x < 0){
                 transform.localScale = new Vector3(-1,1,1);
             } else {
                 transform.localScale = new Vector3(1,1,1);
@@ -139,7 +149,7 @@ public class PlayerController : Movable
             }
 
             // KEEP ATTACKING IF OVER CERTAIN VELOCITY
-            if (rb.velocity.magnitude > attackVelocityLimit){                
+            if (rb.linearVelocity.magnitude > attackVelocityLimit){                
                 attackHitbox.Attack();
             }
         } else {
@@ -151,7 +161,7 @@ public class PlayerController : Movable
     // FIXED UPDATE
     private void FixedUpdate()
     {
-        if (rb.velocity.y < ((-attackVelocityLimit) * 1.1f)) rb.velocity.Set(rb.velocity.x, (-attackVelocityLimit) * 1.1f);
+        if (rb.linearVelocity.y < ((-attackVelocityLimit) * 1.1f)) rb.linearVelocity.Set(rb.linearVelocity.x, (-attackVelocityLimit) * 1.1f);
     }
 
     // RESET PLAYER
@@ -178,7 +188,10 @@ public class PlayerController : Movable
     // PREPARE JUMP & ADD FORCE
     private void PrepareJump(float input)
     {
-        jumpForce = Globals.Approach(jumpForce, maxJumpForce, (input * 500f + (jumpForce * 0.1f)) * Time.deltaTime);
+        jumpForce = Globals.Approach(jumpForce, Globals.G_MAX_JUMP_FORCE, (input * Globals.G_JUMPBUILDSPD + (jumpForce * 0.1f)) * Time.deltaTime);
+        jfSr.enabled = true;
+        jfSr.color = new Color(1f, 1f, 1f, (jumpForce / Globals.G_MAX_JUMP_FORCE) * 0.75f * jumpFlash.alphaMod);
+        jFlash.transform.localScale = new Vector3(Globals.EaseInOutSine(jumpForce / Globals.G_MAX_JUMP_FORCE) * 3, Globals.EaseInOutSine(jumpForce / Globals.G_MAX_JUMP_FORCE) * 3, 1f);
     }
 
     // PERFORM JUMP WITH BUILT FORCE
@@ -196,6 +209,8 @@ public class PlayerController : Movable
             anim.SetTrigger("jump");
             AudioManager.instance.Play("jump");
             jumpPS.Play();
+
+            jfSr.enabled = false;
         } else {
             jumpForce = 0f;
         }
