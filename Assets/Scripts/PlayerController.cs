@@ -45,7 +45,9 @@ public class PlayerController : Movable
     public bool isGrappling = false;
     protected float distToGround;
 
+    // GETTERS
     public float getJumpForce() { return jumpForce; }
+    public float getPlayerVelocity() { return rb.linearVelocity.magnitude; }
 
     // PARTICLE SYSTEMS
     public ParticleSystem flashPS;
@@ -161,7 +163,8 @@ public class PlayerController : Movable
     // FIXED UPDATE
     private void FixedUpdate()
     {
-        if (rb.linearVelocity.y < ((-attackVelocityLimit) * 1.1f)) rb.linearVelocity.Set(rb.linearVelocity.x, (-attackVelocityLimit) * 1.1f);
+        if (rb.linearVelocity.y < ((-attackVelocityLimit) * 1.1f)) 
+            rb.linearVelocity.Set(rb.linearVelocity.x, (-attackVelocityLimit) * 1.1f);
     }
 
     // RESET PLAYER

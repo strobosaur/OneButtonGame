@@ -6,6 +6,7 @@ public class AttackHitbox : Collidable
 {
     public PlayerController player;
     public TrailRenderer attackPS1;
+    public GameObject HitboxCircle;
 
     private float lastAttack;
     private float attackDuration = 0.85f;
@@ -20,17 +21,25 @@ public class AttackHitbox : Collidable
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
+
+        // TOGGLE COLLIDER
         if (endAttack) {
             if (Time.time - lastAttack > attackDuration) {
                 collider.enabled = false;
             }
         }
 
+        // TOGGLE PARTICLE SYSTEM EMISSION BASED ON HITBOX STATE
         if (collider.enabled) {
             attackPS1.emitting = true;
         } else {
             attackPS1.emitting = false;
         }
+
+        // BOOST HITBOX RADIUS BY PLAYER VELOCITY
+        float velocity = player.getPlayerVelocity();
+        //collider.radius *= 1 + (velocity * 1.00025f);
+        //HitboxCircle.transform. = new Vector2(collider.radius * 2, collider.radius * 2);
     }
 
     public void Attack()

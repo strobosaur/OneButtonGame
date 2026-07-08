@@ -7,28 +7,15 @@ public class Collidable : MonoBehaviour
 {
     public ContactFilter2D filter;
     protected CircleCollider2D collider;
-    //protected BoxCollider2D boxCollider;
     private Collider2D[] hits = new Collider2D[10];
 
     protected virtual void Start()
     {
-        //boxCollider = GetComponent<BoxCollider2D>();
         collider = GetComponent<CircleCollider2D>();
     }
 
     protected virtual void FixedUpdate()
     {
-        // COLLISION CHECK
-        //boxCollider.Overlap(filter, hits);
-        //for (int i = 0; i < hits.Length; i++)
-        //{
-        //    if(hits[i] == null)
-        //        continue;
-        //    else
-        //        OnCollide(hits[i]);
-
-        //    hits[i] = null;
-        //}
         collider.Overlap(filter, hits);
         for(int i = 0; i < hits.Length; i++)
         {
